@@ -13,7 +13,7 @@ const router = useRouter();
 
 onMounted(() => {
   if (!sessionStorage.getItem('session')) {
-    router.push({name:'login'}); // main으로 리다이렉트
+    router.push({name:'login'});
   }
 });
 
