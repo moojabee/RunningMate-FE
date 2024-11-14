@@ -1,13 +1,13 @@
 <template>
-  <div>
-
-  </div>
+    <div>
+        <RouterView/>
+    </div>
 </template>
 
 <script setup>
 
 </script>
 
-<style scoped>
+<style  scoped>
 
 </style>
