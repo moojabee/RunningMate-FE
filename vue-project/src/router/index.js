@@ -4,6 +4,9 @@ import UserAuthRegist from '@/components/userAuth/UserAuthRegist.vue'
 import UserAuthView from '@/views/UserAuthView.vue'
 import { createRouter, createWebHistory } from 'vue-router'
 import MainView from '@/views/MainView.vue'
+import BoardView from '@/components/board/BoardView.vue'
+import BoardListFollow from '@/components/board/BoardListFollow.vue'
+import BoardListNeighbor from '@/components/board/BoardListNeighbor.vue'
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -11,7 +14,27 @@ const router = createRouter({
     {
       path:'/',
       name:'main',
-      component:MainView
+      component: MainView,
+      children: [
+        {
+          path: '/board',
+          name: 'board',
+          component: BoardView,
+          redirect: { name: 'followBoardList' },
+          children: [
+            {
+              path: 'follow',
+              name: 'followBoardList',
+              component: BoardListFollow
+            },
+            {
+              path: 'neighbor',
+              name: 'neighborBoardList',
+              component: BoardListNeighbor
+            },
+          ]
+        },
+      ]
     },
     {
       path: '/userAuth',
@@ -35,6 +58,7 @@ const router = createRouter({
         }
       ]
     },
+
   ],
 })
 
