@@ -21,6 +21,7 @@
     const login = function(){
         userAuthStore.login(id.value,password.value);
     }
+    
     onMounted(() => {
     if (sessionStorage.getItem('session')) {
         router.push('/main'); // main으로 리다이렉트
