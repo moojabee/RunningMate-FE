@@ -8,13 +8,11 @@ axios.defaults.withCredentials = true;
 const REST_API_URL = `http://localhost:8080/board`
 
 export const useBoardStore = defineStore('board', () => {
-  // 게시글 목록 스토어에서 관리
   const followBoardList = ref([])
   const neighborBoardList = ref([])
 
   const token = ref(sessionStorage.getItem('session'));
 
-  // 공통으로 헤더를 생성하는 함수 추가
   const getAuthHeaders = () => ({
     Authorization: token.value
   });
