@@ -11,6 +11,8 @@ import ChatView from '@/components/chat/ChatView.vue'
 import ChatListPrivate from '@/components/chat/ChatListPrivate.vue'
 import ChatListOpen from '@/components/chat/ChatListOpen.vue'
 import ChatCreate from '@/components/chat/ChatCreate.vue'
+import BoardCreate from '@/components/board/BoardCreate.vue'
+import BoardUpdate from '@/components/board/BoardUpdate.vue'
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -35,6 +37,16 @@ const router = createRouter({
               path: 'neighbor',
               name: 'neighborBoardList',
               component: BoardListNeighbor
+            },
+            {
+              path: 'create',
+              name: 'boardCreate',
+              component: BoardCreate
+            },
+            {
+              path: 'update/:id',
+              name: 'boardUpdate',
+              component: BoardUpdate
             },
           ]
         },
