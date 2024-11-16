@@ -2,9 +2,9 @@
     <div>
         <h2>OpenChatting</h2>
         <hr>
-        <template v-for="room in openChatRoomList" :key="room">
+        <template v-for="room in store.openChatRoomList" :key="room">
             <div>
-                1
+                {{ room.roomName }}
             </div>
         </template>
     </div>
@@ -16,12 +16,12 @@
 
     const store = useChatRoomStore()
 
-    const openChatRoomList = ref([])
     const fetchOpenChatRoomList = function(){
-        openChatRoomList.value = store.loadOpenChatRoomList();
+        store.loadOpenChatRoomList();
     }
 
-    onMounted(fetchOpenChatRoomList)
+    onMounted(()=>fetchOpenChatRoomList())
+
 </script>
 
 <style scoped>

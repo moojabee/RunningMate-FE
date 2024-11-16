@@ -2,9 +2,9 @@
     <div>
         <h2>PrivateChatting</h2>
         <hr>
-        <template v-for="room in chatRoomList" :key="room">
+        <template v-for="room in store.chatRoomList" :key="room">
             <div>
-                {{ room }}
+                {{ room.roomName }}
             </div>
         </template>
     </div>
@@ -12,16 +12,15 @@
 
 <script setup>
     import { useChatRoomStore } from '@/stores/chatRoom';
-import { onMounted, ref } from 'vue';
+    import { onMounted, ref } from 'vue';
 
     const store = useChatRoomStore()
 
-    const chatRoomList = ref([]);
     const fetchChatRoomList = function(){
-        chatRoomList.value = store.loadChatRoomList();
+        store.loadChatRoomList();
     }
 
-    onMounted(fetchChatRoomList)
+    onMounted(()=>fetchChatRoomList())
 
 </script>
 

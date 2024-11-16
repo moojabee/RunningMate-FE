@@ -12,24 +12,26 @@ export const useChatRoomStore = defineStore('chatRoom', () => {
         Authorization : token.value
     })
 
+    const chatRoomList = ref([])
     const loadChatRoomList = function(){
         axios.get(`${REST_API_URL}/room-list`,{
             headers:getAuthHeaders(),
         })
         .then((res)=>{
-            return res.data;
+            chatRoomList.value = res.data
         })
         .catch((error)=>{
             console.log("채팅방 목록 조회 실패",error)
         })
     }
 
+    const openChatRoomList = ref([])
     const loadOpenChatRoomList = function(){
-        axios.get(`${REST_API_URL}`/room-list/open),{
+        axios.get(`${REST_API_URL}/room-list/open`,{
             headers:getAuthHeaders(),
-        }
+        })
         .then((res)=>{
-            return res.data;
+            openChatRoomList.value = res.data
         })
         .catch((error)=>{
             console.log("오픈 채팅방 목록 조회 실패",error)
@@ -52,5 +54,5 @@ export const useChatRoomStore = defineStore('chatRoom', () => {
         })
     }
 
-    return {loadChatRoomList,loadOpenChatRoomList,createChatRoom};
+    return {loadChatRoomList,loadOpenChatRoomList,createChatRoom,chatRoomList,openChatRoomList};
 })
