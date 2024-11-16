@@ -19,7 +19,7 @@ export const useChatRoomStore = defineStore('chatRoom', () => {
         })
         .then((res)=>{
             chatRoomList.value = res.data
-        })
+        })  
         .catch((error)=>{
             console.log("채팅방 목록 조회 실패",error)
         })
@@ -38,11 +38,12 @@ export const useChatRoomStore = defineStore('chatRoom', () => {
         })
     }
 
-    const createChatRoom = function(chatRoom){
+    const createChatRoom = function(chatRoomCreatDto){
+        console.log(chatRoomCreatDto)
         axios({
             url:`${REST_API_URL}/new-room`,
             method:'POST',
-            data:chatRoom,
+            data: chatRoomCreatDto ,
             headers:getAuthHeaders(),
         })
         .then((res)=>{
@@ -50,8 +51,14 @@ export const useChatRoomStore = defineStore('chatRoom', () => {
             router.push({name: 'privateChatList'})
         })
         .catch((err)=>{
-            console.log("생성 실패",error)
+            console.log(chatRoomCreatDto)
+            console.log("생성 실패",err)
         })
+    }
+
+    const chatData = ref([])
+    const loadChatData = function(){
+        
     }
 
     return {loadChatRoomList,loadOpenChatRoomList,createChatRoom,chatRoomList,openChatRoomList};

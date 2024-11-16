@@ -58,8 +58,12 @@
 </template>
 
 <script setup>
-import { ref } from 'vue';
+import { useChatRoomStore } from '@/stores/chatRoom';
+import { computed, ref } from 'vue';
 import { useRouter } from 'vue-router'; // Vue Router 사용
+
+const router = useRouter();
+const store = useChatRoomStore();
 
 // 상태 관리
 const roomName = ref('');
@@ -67,8 +71,11 @@ const roomType = ref('PRIVATE'); // 기본값 PRIVATE
 const inviteName = ref(''); // 초대할 사람 이름
 const invitees = ref([]); // 초대 명단 배열
 
-// Vue Router 사용 설정
-const router = useRouter();
+const chatRoomCreateDto = computed(() => ({
+    roomName:roomName.value,
+    roomType:roomType.value,
+    userList:invitees.value
+}))
 
 // 초대 명단에 추가
 const addInvitee = () => {
@@ -80,6 +87,7 @@ const addInvitee = () => {
         alert('이미 초대된 사람입니다.');
         return;
     }
+
     invitees.value.push(inviteName.value.trim());
     inviteName.value = ''; // 입력 필드 초기화
 };
@@ -95,11 +103,12 @@ const createRoom = () => {
         alert('채팅방 이름을 입력해주세요.');
         return;
     }
-    alert(`채팅방 생성: 이름=${roomName.value}, 유형=${roomType.value}, 초대 명단=${invitees.value.join(', ')}`);
     
-    // 생성 완료 후 채팅방 리스트로 이동
-    router.push({name:'privateChatList'});
+    alert(`채팅방 생성 : ${roomName.value}`);
+    
+    store.createChatRoom(chatRoomCreateDto.value);
 };
+
 </script>
 
 <style scoped>
