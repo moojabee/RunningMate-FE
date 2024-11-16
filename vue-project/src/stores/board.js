@@ -49,7 +49,7 @@ export const useBoardStore = defineStore('board', () => {
   }
 
   // 게시글 등록
-  const createBoard = function(board, files, userId) {
+  const createBoard = function(board, files) {
     const formData = new FormData()
     formData.append("content", board.content)
     files.forEach(file => {
@@ -57,10 +57,11 @@ export const useBoardStore = defineStore('board', () => {
     })
   
     axios({
-      url: `${REST_API_URL}/create/${userId}`,
+      url: `${REST_API_URL}/create`,
       method: 'POST',
       data: formData,
       headers: {
+        ...getAuthHeaders(),
         'Content-Type': 'multipart/form-data',
       }
     })
@@ -75,8 +76,9 @@ export const useBoardStore = defineStore('board', () => {
 
   // 게시글 삭제 메서드
   const deleteBoard = (boardId) => {
-    const userId = 1; // 임시 userId
-    axios.delete(`${REST_API_URL}/delete/${userId}/${boardId}`)
+    axios.delete(`${REST_API_URL}/delete/${boardId}`, {
+        headers: getAuthHeaders(),
+      })
       .then(() => {
         console.log("게시글 삭제 완료");
         // 목록에서 삭제된 게시글 제거
@@ -90,18 +92,26 @@ export const useBoardStore = defineStore('board', () => {
 
 
   // 게시글 수정 메서드
-  const updateBoard = function(board, files, userId, boardId) {
+  const updateBoard = function(board, files, boardId, deleteImgIds) {
     const formData = new FormData();
     formData.append("content", board.content);
+
+    deleteImgIds.forEach(id => {
+      formData.append("deleteImgIds", id);
+    });
+
     files.forEach(file => {
         formData.append("boardImg", file);
     });
 
+    console.log("FormData:", [...formData.entries()]);
+    
     axios({
-        url: `${REST_API_URL}/update/${userId}/${boardId}`, // userId와 boardId를 포함
+        url: `${REST_API_URL}/update/${boardId}`,
         method: 'PUT',
         data: formData,
         headers: {
+            ...getAuthHeaders(),
             'Content-Type': 'multipart/form-data',
         }
     })
