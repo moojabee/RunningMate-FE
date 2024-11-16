@@ -7,6 +7,10 @@ import MainView from '@/views/MainView.vue'
 import BoardView from '@/components/board/BoardView.vue'
 import BoardListFollow from '@/components/board/BoardListFollow.vue'
 import BoardListNeighbor from '@/components/board/BoardListNeighbor.vue'
+import ChatView from '@/components/chat/ChatView.vue'
+import ChatListPrivate from '@/components/chat/ChatListPrivate.vue'
+import ChatListOpen from '@/components/chat/ChatListOpen.vue'
+import ChatCreate from '@/components/chat/ChatCreate.vue'
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -34,6 +38,29 @@ const router = createRouter({
             },
           ]
         },
+        {
+          path: '/chat',
+          name: 'chat',
+          component: ChatView,
+          redirect: {name : 'privateChatList'},
+          children: [
+            {
+              path: 'private',
+              name: 'privateChatList',
+              component: ChatListPrivate
+            },
+            {
+              path: 'open',
+              name: 'openChatList',
+              component: ChatListOpen
+            },
+            {
+              path: 'create',
+              name: 'createChat',
+              component: ChatCreate
+            },
+          ]
+        }
       ]
     },
     {
