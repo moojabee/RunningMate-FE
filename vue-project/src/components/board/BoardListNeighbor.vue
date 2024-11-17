@@ -12,6 +12,7 @@
           <th>내용</th>
           <th>댓글 수</th>
           <th>좋아요 수</th>
+          <th>댓글 확인</th>
           <th>등록일</th>
           <th>이미지</th>
         </tr>
@@ -23,8 +24,13 @@
           <td>{{ board.userDist }}km</td>
           <td>{{ board.userPace }}</td>
           <td>{{ board.content }}</td>
-          <td>🗨 {{ board.comment.length }}</td>
+          <td>
+            🗨 {{ board.comment.length }}
+          </td>
           <td>❤ {{ board.like.length }}</td>
+          <td>
+            <button @click="openCommentModal(board)">댓글 {{ board.comment.length }}개 보기</button>
+          </td>
           <td>{{ board.postedDate }}</td>
           <td>
             <div v-if="board.boardImg && board.boardImg.length > 0">
@@ -45,27 +51,54 @@
         </tr>
       </tbody>
     </table>
-  </div>
+
+<!-- 댓글 모달 -->
+<CommentView
+  v-if="selectedBoardId > 0"
+  :isVisible="isCommentModalVisible"
+  :comments="selectedComments"
+  :nickname="selectedNickname"
+  :userDist="selectedUserDist"
+  :userPace="selectedUserPace"
+  :boardId="selectedBoardId"
+  @close="isCommentModalVisible = false"
+/>
+</div>
 </template>
 
 <script setup>
+import { ref, onMounted } from 'vue';
 import { useRouter } from 'vue-router';
 import { useBoardStore } from '@/stores/board';
-import { onMounted, computed } from 'vue';
+import CommentView from './CommentView.vue';
 
 const router = useRouter();
 const store = useBoardStore();
 
-const fetchNeighborBoardList = () => {
-  store.getNeighborBoardList();
+const isCommentModalVisible = ref(false);
+const selectedComments = ref([]);
+const selectedNickname = ref('');
+const selectedUserDist = ref('');
+const selectedUserPace = ref('');
+const selectedBoardId = ref(0); 
+
+// 댓글 모달 열기
+const openCommentModal = (board) => {
+  selectedComments.value = board.comment;
+  selectedNickname.value = board.nickname;
+  selectedUserDist.value = board.userDist;
+  selectedUserPace.value = board.userPace;
+  selectedBoardId.value = board.boardId;
+  isCommentModalVisible.value = true;
 };
+
 
 // 수정 페이지로 이동
 const goToUpdatePage = (board) => {
   router.push({
     name: 'boardUpdate',
     params: { id: board.boardId },
-    props: { boardData: board } // 선택한 게시글 데이터를 props로 전달
+    props: { boardData: board }
   });
 };
 
@@ -76,8 +109,10 @@ const confirmDelete = (boardId) => {
   }
 };
 
-// 페이지 마운트 시 호출
-onMounted(fetchNeighborBoardList);
+// 페이지 마운트 시 게시글 목록 가져오기
+onMounted(() => {
+  store.getNeighborBoardList();
+});
 </script>
 
 <style scoped>

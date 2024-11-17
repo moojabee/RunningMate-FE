@@ -29,7 +29,7 @@
           </td>
           <td>❤ {{ board.like.length }}</td>
           <td>
-            <button @click="openCommentModal(board.comment)">댓글 {{ board.comment.length }}개 보기</button>
+            <button @click="openCommentModal(board)">댓글 {{ board.comment.length }}개 보기</button>
           </td>
           <td>{{ board.postedDate }}</td>
           <td>
@@ -54,29 +54,37 @@
 
     <!-- 댓글 모달 -->
     <CommentView
+      v-if="isCommentModalVisible"
       :isVisible="isCommentModalVisible"
-      :comments="selectedComments"
+      :boardId="selectedBoardId"
       @close="isCommentModalVisible = false"
+      @updateCommentCount="updateCommentCount"
     />
   </div>
 </template>
 
 <script setup>
 import { ref, onMounted } from 'vue';
-import { useRouter } from 'vue-router';
 import { useBoardStore } from '@/stores/board';
 import CommentView from './CommentView.vue';
 
-const router = useRouter();
 const store = useBoardStore();
 
 const isCommentModalVisible = ref(false);
-const selectedComments = ref([]);
+const selectedBoardId = ref(0); // 선택된 게시글 ID 추가
 
 // 댓글 모달 열기
-const openCommentModal = (comments) => {
-  selectedComments.value = comments;
+const openCommentModal = (board) => {
+  selectedBoardId.value = board.boardId; // 선택한 게시글 ID 설정
   isCommentModalVisible.value = true;
+};
+
+// 댓글 수 업데이트
+const updateCommentCount = ({ boardId, commentCount }) => {
+  const board = store.followBoardList.find((b) => b.boardId === boardId);
+  if (board) {
+    board.commentCount = commentCount; // 댓글 수 업데이트
+  }
 };
 
 // 수정 페이지로 이동
