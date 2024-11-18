@@ -22,7 +22,7 @@
     }
 
     const enterChatRoom = function(roomId,roomName){
-        router.push({ name: 'entryRoom', params: { id: roomId, name:roomName } })
+        router.push({ name: 'entryRoom', params: { roomId: roomId, roomName:roomName } })
     }
 
     onMounted(()=>fetchChatRoomList())

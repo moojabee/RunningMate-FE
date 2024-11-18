@@ -70,7 +70,7 @@ export const useChatRoomStore = defineStore('chatRoom', () => {
         })
         .then((res)=>{
             if(res)console.log("참가 성공");
-            router.push({ name: 'entryRoom', params: { id: party.roomId, name:party.roomName} })
+            router.push({ name: 'entryRoom', params: { roomId: party.roomId, roomName:party.roomName} })
             .catch((err) => console.error("라우터 이동 중 에러:", err));
         })
         .catch((err)=>{

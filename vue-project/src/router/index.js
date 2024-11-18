@@ -73,7 +73,7 @@ const router = createRouter({
               component: ChatCreate
             },
             {
-              path: 'entry/:id/:name',
+              path: 'entry/:roomId/:roomName',
               name: 'entryRoom',
               component: ChatEntryRoom
             },
