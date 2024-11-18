@@ -26,7 +26,10 @@
                   <td>{{ comment.content }}</td>
                   <td>{{ comment.postedDate }}</td>
                   <td>
-                    <button @click="confirmDeleteComment(comment.commentId)">삭제</button>
+                    <button @click="handleActions(comment)">...</button>
+                    <div v-show="visibleActions[comment.commentId]" style="margin-top: 5px;">
+                      <button @click="confirmDeleteComment(comment.commentId)">삭제</button>
+                    </div>
                   </td>
                 </tr>
               </tbody>
@@ -50,7 +53,7 @@
   
 <script setup>
 import { useCommentStore } from "@/stores/comment";
-import { ref, computed, watch } from "vue";
+import { ref, reactive, computed, watch } from "vue";
 
 const props = defineProps({
   isVisible: Boolean,
@@ -89,6 +92,7 @@ const submitComment = async () => {
   try {
     await store.createComment(props.boardId, newComment.value);
     newComment.value = ''; // 입력 필드 초기화
+    emit('updateCommentCount', { boardId: props.boardId, change: 1 });
   } catch (error) {
     alert('댓글 작성에 실패했습니다.');
   }
@@ -99,9 +103,27 @@ const confirmDeleteComment = async (commentId) => {
   if (confirm('댓글을 삭제하시겠습니까?')) {
     try {
       await store.deleteComment(commentId, props.boardId); // boardId 전달
+      emit('updateCommentCount', { boardId: props.boardId, change: -1 });
     } catch (error) {
       alert('댓글 삭제에 실패했습니다.');
     }
+  }
+};
+
+// 수정/삭제 버튼 가시성을 관리하는 상태
+const visibleActions = reactive({});
+
+// 액션 버튼 클릭 처리 (작성자 확인)
+const handleActions = async (comment) => {
+  const check = await store.userCheck(comment.userId);
+  if (check) {
+    // 작성자가 맞으면 가시성을 토글
+    if (visibleActions[comment.commentId]) {
+      visibleActions[comment.commentId] = false; // 숨기기
+    } else {
+      visibleActions[comment.commentId] = true; // 보이기
+    }
+  } else {
   }
 };
 

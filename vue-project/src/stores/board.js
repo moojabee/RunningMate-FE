@@ -10,6 +10,7 @@ const REST_API_URL = `http://localhost:8080/board`
 export const useBoardStore = defineStore('board', () => {
   const followBoardList = ref([])
   const neighborBoardList = ref([])
+  const isLoading = ref(false);
 
   const token = ref(sessionStorage.getItem('session'));
 
@@ -124,6 +125,39 @@ export const useBoardStore = defineStore('board', () => {
     });
   };
 
-  return { followBoardList, neighborBoardList, 
-    getFollowBoardList, getNeighborBoardList, createBoard, deleteBoard, updateBoard }
+  // 작성자인지 확인하는 메서드
+  const userCheck = async (writerId) => {
+    try {
+      const response = await axios.get(`${REST_API_URL}/userCheck`, {
+        params: { writerId },
+        headers: getAuthHeaders(),
+      });
+      return response.data; // true 또는 false 반환
+    } catch (error) {
+      console.error('작성자 확인 실패:', error);
+      return false;
+    }
+  };
+
+  // 좋아요 변경
+  const toggleLike = async (boardId, currentLikeCheck) => {
+    try {
+      const response = await axios.post(
+        `${REST_API_URL}/like/${boardId}`,
+        { likeCheck: currentLikeCheck }, // 요청 본문
+        {
+          headers: getAuthHeaders(), // 헤더는 세 번째 인자로 전달
+        }
+      );
+      return response.data; // 새로운 likeCheck 상태 (1 또는 0)
+    } catch (error) {
+      console.error(`좋아요 상태 변경 실패: ${boardId}`, error);
+      throw error;
+    }
+  };
+  
+
+  return { followBoardList, neighborBoardList, isLoading, 
+    getFollowBoardList, getNeighborBoardList, createBoard, deleteBoard, updateBoard,
+    userCheck, toggleLike }
 })
