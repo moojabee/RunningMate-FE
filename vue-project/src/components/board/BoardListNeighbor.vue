@@ -6,6 +6,7 @@
       <thead>
         <tr>
           <th>userId</th>
+          <th>프로필사진</th>
           <th>닉네임</th>
           <th>총 거리</th>
           <th>평균 페이스</th>
@@ -21,6 +22,21 @@
       <tbody>
         <tr v-for="board in store.neighborBoardList" :key="board.id">
           <td>{{ board.userId }}</td>
+          <td>
+            <!-- 프로필 이미지 -->
+            <img
+              v-if="board.userImg"
+              :src="board.userImg"
+              alt="프로필 이미지"
+              style="width: 50px; height: 50px; object-fit: cover; border-radius: 20%;"
+            />
+            <img
+              v-else
+              src="@/assets/default-profile.png"
+              alt="기본 프로필 이미지"
+              style="width: 50px; height: 50px; object-fit: cover; border-radius: 20%;"
+            />
+          </td>
           <td>{{ board.nickname }}</td>
           <td>{{ board.userDist }}km</td>
           <td>{{ board.userPace }}</td>

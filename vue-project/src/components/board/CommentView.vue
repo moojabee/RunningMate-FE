@@ -10,6 +10,7 @@
             <table>
               <thead>
                 <tr>
+                  <th>프로필</th>
                   <th>작성자</th>
                   <th>총 거리</th>
                   <th>평균 페이스</th>
@@ -20,6 +21,20 @@
               </thead>
               <tbody>
                 <tr v-for="comment in commentList" :key="comment.commentId">
+                  <td>
+                  <img
+                    v-if="comment.userImg"
+                    :src="comment.userImg"
+                    alt="프로필 이미지"
+                    style="width: 50px; height: 50px; object-fit: cover; border-radius: 20%;"
+                  />
+                  <img
+                    v-else
+                    src="@/assets/default-profile.png"
+                    alt="기본 프로필 이미지"
+                    style="width: 50px; height: 50px; object-fit: cover; border-radius: 20%;"
+                  />
+                </td>
                   <td>{{ comment.nickname }}</td>
                   <td>{{ comment.userDist }} km</td>
                   <td>{{ comment.userPace }}</td>
