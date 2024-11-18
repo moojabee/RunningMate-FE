@@ -56,5 +56,8 @@ export const useChatRoomStore = defineStore('chatRoom', () => {
         })
     }
 
+    const joinChatRoom = function(){
+        
+    }
     return {loadChatRoomList,loadOpenChatRoomList,createChatRoom,chatRoomList,openChatRoomList};
 })
