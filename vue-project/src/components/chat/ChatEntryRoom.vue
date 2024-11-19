@@ -70,6 +70,7 @@ const connect = () => {
     stompClient.publish({
       destination: '/pub/chat/message',
       headers: getAuthHeaders(),
+        
       body: JSON.stringify({
         roomId: roomId.value,
         userId: 1, // 예제에서는 1번 유저
@@ -84,8 +85,14 @@ const connect = () => {
   };
 
   // 연결 종료 시
-  stompClient.onWebSocketClose = () => {
-    console.log('WebSocket 연결 종료');
+  stompClient.onWebSocketClose = (closeEvent) => {
+    console.log('WebSocket 연결 종료')
+
+    if(closeEvent){
+        console.log(`종료 코드 : ${closeEvent.code}`)
+        console.log(`종료 이유 : ${closeEvent.reason}`)
+        console.log(`정상 종료 : ${closeEvent.wasClean}`)
+    }
   };
 
   // 클라이언트 활성화
