@@ -16,6 +16,7 @@ import BoardUpdate from '@/components/board/BoardUpdate.vue'
 import MyPageView from '@/components/myPage/MyPageView.vue'
 import MyBoard from '@/components/myPage/MyBoard.vue'
 import MyRun from '@/components/myPage/MyRun.vue'
+import ChatEntryRoom from '@/components/chat/ChatEntryRoom.vue'
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -73,6 +74,11 @@ const router = createRouter({
               path: 'create',
               name: 'createChat',
               component: ChatCreate
+            },
+            {
+              path: 'entry/:roomId/:roomName',
+              name: 'entryRoom',
+              component: ChatEntryRoom
             },
           ]
         },
