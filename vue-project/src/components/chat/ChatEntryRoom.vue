@@ -1,6 +1,6 @@
 <template>
   <div class="container">
-    <h2>{{ roomId }}</h2>
+    <h2>{{ roomId}}</h2>
     <div class="input-group">
       <div class="input-group-prepend">
         <label class="input-group-text">내용</label>
@@ -19,7 +19,7 @@
     </div>
     <ul class="list-group mt-3">
       <li class="list-group-item" v-for="msg in messages" :key="msg.id">
-        {{ msg.sender }} - {{ msg.message }}
+        {{ msg.userId }} - {{ msg.content }}
       </li>
     </ul>
   </div>
@@ -34,60 +34,66 @@ import { useRoute } from 'vue-router';
 
 const route = useRoute()
 const roomId = ref(route.params.roomId);
+
+
+const room = ref({});
 const message = ref('');
 const messages = ref([]);
-const sender = ref(1);
+const userId = ref(sessionStorage.getItem('userId'));
 const stompClient = ref(null);
-const headers = ref(sessionStorage.getItem('session'))
-    const getAuthHeaders = () => ({
-        Authorization : token.value
-    })
 
 const connect = () => {
-  const socket = new SockJS('http://localhost:8080/ws-stomp');
-  stompClient.value = Stomp.over(socket);
-  stompClient.value.connect(headers.value, () => {
-    console.log(stompClient.value)
-    stompClient.value.subscribe(`/sub/chat/room/${roomId.value}`, (message) => {
-      console.log(`${roomId.value}`)
-      const receivedMessage = JSON.parse(message.body);
-      recvMessage(receivedMessage);
+      const socket = new SockJS('http://localhost:8080/ws-stomp');
+      stompClient.value = Stomp.over(socket);
+      stompClient.value.connect({}, () => {
+          console.log("STOMP 연결 성공");
+      }, (error) => {
+          console.error("STOMP 연결 실패: ", error);
+      }); 
+      
+      stompClient.value.connect({}, () => {
+        console.log("헤이2")
+        stompClient.value.subscribe(`/sub/chat/room/${roomId.value}`, (message) => {
+          const receivedMessage = JSON.parse(message.body);
+          recvMessage(receivedMessage);
+        });
+
+
+        stompClient.value.send('/pub/chat/message', {}, JSON.stringify({
+          messageType: 'ENTER',
+          roomId: roomId.value,
+          userId: userId.value,
+          content: message.value,
+        }));
+
+      }, (error) => {
+          console.error("STOMP 연결 실패: ", error);
+      }); 
+    };
+
+    const sendMessage = () => {
+      if (stompClient.value && message.value) {
+        stompClient.value.send('/pub/chat/message', {}, JSON.stringify({
+          messageType: 'TALK',
+          roomId: roomId.value,
+          userId: userId.value,
+          content: message.value,
+        }));
+
+        message.value = '';
+      }
+    };
+
+    const recvMessage = (receivedMessage) => {
+      messages.value.unshift({
+        userId: receivedMessage.messageType === 'ENTER' ? '[알림]' : receivedMessage.userId,
+        content: receivedMessage.content,
+      });
+    };
+
+    onMounted(() => {
+      connect();
     });
-
-    stompClient.value.send('/pub/chat/message', {}, JSON.stringify({
-      type: 'ENTER',
-      roomId: roomId.value,
-      sender: sender.value
-    }));
-  });
-};
-
-const sendMessage = () => {
-  if (stompClient.value && message.value) {
-    stompClient.value.send(`/pub/chat/message/${roomId.value}`, {}, JSON.stringify({
-      type: 'TALK',
-      roomId: roomId.value,
-      sender: sender.value,
-      message: message.value
-    }));
-    message.value = '';
-  }
-  else {
-    console.error("WebSocket 연결이 끊겼습니다. 재연결 시도 중...");
-    connect(); // WebSocket 재연결 시도
-  }
-};
-
-const recvMessage = (receivedMessage) => {
-  messages.value.unshift({
-    sender: receivedMessage.type === 'ENTER' ? '[알림]' : receivedMessage.sender,
-    message: receivedMessage.message
-  });
-};
-
-onMounted(() => {
-  connect();
-});
 </script>
 
 <style scoped>

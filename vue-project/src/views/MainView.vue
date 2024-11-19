@@ -1,6 +1,6 @@
 <template>
   <div>
-    <h2>{{ userAuthStore.user }}님 안녕하세요</h2>
+    <h2>{{ userId}}님 안녕하세요</h2>
     <hr>
     <TheFooterNav/>
     <hr>
@@ -12,7 +12,7 @@
   import TheFooterNav from '@/components/common/TheFooterNav.vue';
   import { useUserAuthStore } from '@/stores/userAuth';
   const userAuthStore = useUserAuthStore();
-
+  const userId = sessionStorage.getItem('userId');
 </script>
 
 <style scoped>
