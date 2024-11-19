@@ -7,7 +7,7 @@ const REST_API_URL=import.meta.env.VITE_REST_API_URL
 
 export const useUserAuthStore = defineStore('userAuth', () => {
     
-    const user = ref(null);   
+    const userId = ref(0);   
     const login = function(email,password){
         const token = ref('');
 
@@ -16,9 +16,10 @@ export const useUserAuthStore = defineStore('userAuth', () => {
             password:password
         })
         .then((res)=>{
-            user.value = res.data
-            alert(`${user.value}님 안녕하세요! 로그인 성공`)
+            userId.value = res.data
+            alert(`${userId.value}님 안녕하세요! 로그인 성공`)
             token.value = res.headers['authorization'];
+            sessionStorage.setItem('userId',userId.value);
             sessionStorage.setItem('session',token.value);
             router.push({name:'main'})
         })
@@ -28,7 +29,8 @@ export const useUserAuthStore = defineStore('userAuth', () => {
     }
 
     const logout = function(){
-        user.value = null
+        userId.value = 0
+        sessionStorage.removeItem('userId')
         sessionStorage.removeItem('session')
         router.push({name:'login'})
     }
@@ -57,5 +59,5 @@ export const useUserAuthStore = defineStore('userAuth', () => {
         })
     }
 
-    return { login, logout, findPassword, regist, user}
+    return { login, logout, findPassword, regist, userId}
 })

@@ -4,14 +4,15 @@
         <RouterLink :to="{name: 'board'}">board</RouterLink> |
         <RouterLink :to="{name: 'chat'}">chat</RouterLink> |
         <RouterLink :to="{name: 'board'}">running</RouterLink> |
-        <RouterLink :to="{name: 'board'}">mypage</RouterLink>
+        <RouterLink :to="{name: 'myPage', params: { id: userAuthStore.userId } }">myPage</RouterLink>
         </nav>
         <RouterView/>
     </div>
 </template>
 
 <script setup>
-
+import { useUserAuthStore } from "@/stores/userAuth";
+const userAuthStore = useUserAuthStore();
 </script>
 
 <style scoped>

@@ -13,6 +13,9 @@
 <script setup>
     import { useUserAuthStore } from '@/stores/userAuth';
     import { onMounted, ref } from 'vue';
+    import { useRouter } from 'vue-router';
+
+    const router = useRouter();
 
     const userAuthStore = useUserAuthStore();
     const id = ref('')
