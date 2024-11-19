@@ -1,6 +1,18 @@
 <template>
-  <div class="container">
+  <div class="container chat-container">
     <h2>{{ roomId }}</h2>
+    <!-- 메시지 리스트 -->
+    <ul class="list-group mt-3 chat-list" ref="messageList">
+      <li
+        class="list-group-item"
+        v-for="(msg, index) in messages"
+        :key="index"
+        :class="{ 'my-message': msg.userId == userId, 'other-message': msg.userId != userId, 'notice':msg.userId == '[알림]' }"
+      >
+        <span class="message-user" v-if="msg.userId !== userId">{{ msg.userId }}</span>
+        <span class="message-content">{{ msg.content }}</span>
+      </li>
+    </ul>
     <div class="input-group">
       <div class="input-group-prepend">
         <label class="input-group-text">내용</label>
@@ -17,14 +29,9 @@
         </button>
       </div>
     </div>
-    <!-- 스크롤 가능 메시지 리스트 -->
-    <ul class="list-group mt-3 chat-list" ref="messageList">
-        <li class="list-group-item" v-for="msg in messages" :key="msg.id">
-            {{ msg.userId }} - {{ msg.content }}
-        </li>
-    </ul>
   </div>
 </template>
+
 <script setup>
 import { ref, onMounted, nextTick } from 'vue';
 import SockJS from 'sockjs-client';
@@ -98,7 +105,7 @@ const sendMessage = () => {
 // 메시지 수신 처리 함수
 const recvMessage = (receivedMessage) => {
   messages.value.push({
-    userId: receivedMessage.messageType === 'ENTER' ? '[알림]' : receivedMessage.userId,
+    userId: receivedMessage.messageType == 'ENTER' ? '[알림]' : receivedMessage.userId,
     content: receivedMessage.content,
   });
 
@@ -117,11 +124,8 @@ const scrollToBottom = () => {
 const loadPreviousChats = async () => {
     try {
         await chatRoomStore.loadChatting(roomId.value);
-        messages.value = chatRoomStore.chatMessage.map((msg, index) => ({
-            id: index, // 고유한 ID 추가
-            userId: msg.userId,
-            content: msg.content,
-        }));
+        messages.value = chatRoomStore.chatMessage
+        console.log(chatRoomStore.chatMessage)
         nextTick(() => scrollToBottom()); // 스크롤 하단 이동
     } catch (error) {
         console.error('이전 채팅 로드 실패:', error);
@@ -134,3 +138,60 @@ onMounted(() => {
   connect(); // STOMP 연결
 });
 </script>
+<style scoped>
+.chat-container {
+  max-width: 600px;
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.chat-list {
+  display: flex; /* 부모 컨테이너를 flex 컨테이너로 설정 */
+  flex-direction: column; /* 세로 방향 정렬 */
+  max-height: 400px;
+  overflow-y: auto;
+  padding: 0;
+  list-style: none;
+  gap: 5px; /* 메시지 간격 */
+  background-color: #b2c7d9;
+}
+
+.list-group-item {
+  display: flex;
+  flex-direction: column;
+  padding: 10px;
+  border: none;
+  border-radius: 10px;
+  max-width: 60%; /* 메시지 최대 너비 */
+  word-wrap: break-word; /* 긴 텍스트 줄바꿈 */
+}
+
+.my-message {
+  align-self: flex-end; /* 내 메시지는 오른쪽 */
+  background-color: #fee500;
+  text-align: right; /* 텍스트 오른쪽 정렬 */
+}
+
+.other-message {
+  align-self: flex-start; /* 상대방 메시지는 왼쪽 */
+  background-color: #fee500;
+  text-align: left; /* 텍스트 왼쪽 정렬 */
+}
+
+.notice {
+  align-self: center; /* 메시지를 중앙에 정렬 */
+  background-color: transparent; /* 배경 투명 */
+  color: #888; /* 연한 회색 글씨 */
+  font-size: 0.8rem; /* 작은 글씨 */
+  font-weight: 300; /* 얇게 */
+  text-align: center; /* 텍스트 중앙 정렬 */
+  border: none; /* 테두리 제거 */
+}
+
+.message-content {
+  font-size: 1rem;
+  line-height: 1.4;
+}
+</style>
