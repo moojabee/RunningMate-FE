@@ -13,6 +13,7 @@ import ChatListOpen from '@/components/chat/ChatListOpen.vue'
 import ChatCreate from '@/components/chat/ChatCreate.vue'
 import BoardCreate from '@/components/board/BoardCreate.vue'
 import BoardUpdate from '@/components/board/BoardUpdate.vue'
+import ChatEntryRoom from '@/components/chat/ChatEntryRoom.vue'
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -70,6 +71,11 @@ const router = createRouter({
               path: 'create',
               name: 'createChat',
               component: ChatCreate
+            },
+            {
+              path: 'entry/:roomId/:roomName',
+              name: 'entryRoom',
+              component: ChatEntryRoom
             },
           ]
         }
