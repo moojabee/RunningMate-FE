@@ -13,6 +13,9 @@ import ChatListOpen from '@/components/chat/ChatListOpen.vue'
 import ChatCreate from '@/components/chat/ChatCreate.vue'
 import BoardCreate from '@/components/board/BoardCreate.vue'
 import BoardUpdate from '@/components/board/BoardUpdate.vue'
+import MyPageView from '@/components/myPage/MyPageView.vue'
+import MyBoard from '@/components/myPage/MyBoard.vue'
+import MyRun from '@/components/myPage/MyRun.vue'
 import ChatEntryRoom from '@/components/chat/ChatEntryRoom.vue'
 
 const router = createRouter({
@@ -78,7 +81,25 @@ const router = createRouter({
               component: ChatEntryRoom
             },
           ]
-        }
+        },
+        {
+          path: '/myPage/:id',
+          name: 'myPage',
+          component: MyPageView,
+          redirect: { name: 'myBoard' },
+          children: [
+            {
+              path: 'myBoard',
+              name: 'myBoard',
+              component: MyBoard
+            },
+            {
+              path: 'myRun',
+              name: 'myRun',
+              component: MyRun
+            },
+          ]
+        },
       ]
     },
     {
