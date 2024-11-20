@@ -36,7 +36,7 @@ const store = useMyPageStore();
 const runs = ref([]);
 
 onMounted(async () => {
-  const userId = route.params.id;
+  const userId = route.params.userId;
   runs.value = await store.getUserRun(userId);
 });
 </script>
