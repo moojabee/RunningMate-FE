@@ -37,7 +37,12 @@
               style="width: 50px; height: 50px; object-fit: cover; border-radius: 20%;"
             />
           </td>
-          <td>{{ board.nickname }}</td>
+          <td>
+            <!-- 닉네임 클릭 시 myPage로 이동 -->
+            <RouterLink :to="{ name: 'myPage', params: { userId: board.userId } }">
+              {{ board.nickname }}
+            </RouterLink>
+          </td>
           <td>{{ board.userDist }}km</td>
           <td>{{ board.userPace }}</td>
           <td>{{ board.content }}</td>
@@ -110,10 +115,10 @@ const openCommentModal = (board) => {
 };
 
 // 댓글 수 업데이트
-const updateCommentCount = ({ boardId, commentCount }) => {
+const updateCommentCount = ({ boardId, change }) => {
   const board = store.neighborBoardList.find((b) => b.boardId === boardId);
   if (board) {
-    board.commentCount = commentCount; // 댓글 수 업데이트
+    board.commentCount += change;
   }
 };
 
