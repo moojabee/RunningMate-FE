@@ -26,6 +26,34 @@ export const useMyPageStore = defineStore('myPage', () => {
     }
   };
 
-  
-  return { getUserInfo }
+  // 유저 게시글 조회
+  const getUserBoard = async (userId) => {
+    try {
+      const response = await axios.get(`${REST_API_URL}/userBoard/${userId}`, {
+        headers: getAuthHeaders(),
+      });
+      console.log("유저 게시글 조회:", response.data)
+      return response.data.boardList; // boardList를 반환
+    } catch (error) {
+      console.error("게시글 조회 실패:", error);
+      throw error;
+    }
+  };
+
+  // 유저 러닝 기록 조회
+  const getUserRun = async (userId) => {
+    try {
+      const response = await axios.get(`${REST_API_URL}/userRun/${userId}`, {
+        headers: getAuthHeaders(),
+      });
+      console.log("러닝 기록 조회:", response.data)
+      return response.data; // recordList를 반환
+    } catch (error) {
+      console.error("러닝 기록 조회 실패:", error);
+      throw error;
+    }
+  };
+
+
+  return { getUserInfo, getUserBoard, getUserRun }
 })
