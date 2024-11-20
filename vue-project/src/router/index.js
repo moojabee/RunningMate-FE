@@ -17,6 +17,7 @@ import MyPageView from '@/components/myPage/MyPageView.vue'
 import MyBoard from '@/components/myPage/MyBoard.vue'
 import MyRun from '@/components/myPage/MyRun.vue'
 import ChatEntryRoom from '@/components/chat/ChatEntryRoom.vue'
+import MyBoardUpdate from '@/components/myPage/MyBoardUpdate.vue'
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -83,7 +84,7 @@ const router = createRouter({
           ]
         },
         {
-          path: '/myPage/:id',
+          path: '/myPage/:userId',
           name: 'myPage',
           component: MyPageView,
           redirect: { name: 'myBoard' },
@@ -97,6 +98,11 @@ const router = createRouter({
               path: 'myRun',
               name: 'myRun',
               component: MyRun
+            },
+            {
+              path: 'myBoardUpdate/:boardId',
+              name: 'myBoardUpdate',
+              component: MyBoardUpdate
             },
           ]
         },

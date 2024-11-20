@@ -6,8 +6,8 @@
       <thead>
         <tr>
           <th>userId</th>
-          <th>닉네임</th>
           <th>프로필사진</th>
+          <th>닉네임</th>
           <th>총 거리</th>
           <th>평균 페이스</th>
           <th>내용</th>
@@ -37,7 +37,12 @@
               style="width: 50px; height: 50px; object-fit: cover; border-radius: 20%;"
             />
           </td>
-          <td>{{ board.nickname }}</td>
+          <td>
+            <!-- 닉네임 클릭 시 myPage로 이동 -->
+            <RouterLink :to="{ name: 'myPage', params: { userId: board.userId } }">
+              {{ board.nickname }}
+            </RouterLink>
+          </td>
           <td>{{ board.userDist }}km</td>
           <td>{{ board.userPace }}</td>
           <td>{{ board.content }}</td>

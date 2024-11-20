@@ -4,7 +4,9 @@
         <RouterLink :to="{name: 'board'}">board</RouterLink> |
         <RouterLink :to="{name: 'chat'}">chat</RouterLink> |
         <RouterLink :to="{name: 'board'}">running</RouterLink> |
-        <RouterLink :to="{name: 'myPage', params: { id: userAuthStore.userId } }">myPage</RouterLink>
+        <RouterLink
+            :to="{ name: 'myPage', params: { userId: userAuthStore.userId } }"
+            :key="userAuthStore.userId">myPage</RouterLink>
         </nav>
         <RouterView/>
     </div>

@@ -63,19 +63,19 @@ export const useCommentStore = defineStore('comment', () => {
     }
   };
 
-    // 작성자인지 확인하는 메서드
-    const userCheck = async (writerId) => {
-      try {
-        const response = await axios.get(`${REST_API_URL}/userCheck`, {
-          params: { writerId },
-          headers: getAuthHeaders(),
-        });
-        return response.data; // true 또는 false 반환
-      } catch (error) {
-        console.error('작성자 확인 실패:', error);
-        return false;
-      }
-    };
+  // 작성자인지 확인하는 메서드
+  const userCheck = async (writerId) => {
+    try {
+      const response = await axios.get(`${REST_API_URL}/userCheck`, {
+        params: { writerId },
+        headers: getAuthHeaders(),
+      });
+      return response.data; // true 또는 false 반환
+    } catch (error) {
+      console.error('작성자 확인 실패:', error);
+      return false;
+    }
+  };
 
   return { commentList, getCommentsByBoardId, createComment, deleteComment, userCheck };
 });
