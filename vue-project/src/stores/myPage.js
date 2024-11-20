@@ -9,6 +9,7 @@ const REST_API_URL = `http://localhost:8080/myPage`
 
 export const useMyPageStore = defineStore('myPage', () => {
   const myBoardList = ref([]);
+  const userInfo = ref([]);
   const isPrivate = ref(false);
   const isFollower = ref(false);
 
@@ -24,7 +25,8 @@ export const useMyPageStore = defineStore('myPage', () => {
       const response = await axios.get(`${REST_API_URL}/userInfo/${userId}`, {
         headers: getAuthHeaders(),
       });
-      return response.data;
+      userInfo.value = response.data;
+      return userInfo;
     } catch (error) {
       console.error("유저 정보 조회 실패:", error);
       throw error;
@@ -168,7 +170,37 @@ export const useMyPageStore = defineStore('myPage', () => {
     }
   };
 
-  return { myBoardList, getUserInfo, getUserBoard, getUserRun, 
+  // 유저 정보 수정 메서드
+  const updateUserInfo = async (user, userImg) => {
+    const formData = new FormData();
+
+    if (user.password) formData.append("password", user.password);
+    if (user.nickname) formData.append("nickname", user.nickname);
+    if (user.address) formData.append("address", user.address);
+    if (userImg)  formData.append("userImg", userImg);
+
+    try {
+      const response = await axios({
+        url: `${REST_API_URL}/update`,
+        method: "PUT",
+        data: formData,
+        headers: {
+          ...getAuthHeaders(),
+          "Content-Type": "multipart/form-data",
+        },
+      });
+      console.log("유저 정보 수정 완료:", response.data);
+
+      router.replace({ name: "myPage", params: { userId: user.userId } });
+    } catch (error) {
+      console.error("유저 정보 수정 실패:", error);
+      throw error;
+    }
+  };
+
+
+  return { userInfo, myBoardList, getUserInfo, getUserBoard, getUserRun, 
     deleteBoard, updateBoard, toggleLike, userCheck,
-    isPrivate, isFollower, checkPrivate, checkFollower }
+    isPrivate, isFollower, checkPrivate, checkFollower,
+    updateUserInfo }
 })
