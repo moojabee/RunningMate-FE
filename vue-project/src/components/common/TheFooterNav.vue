@@ -1,32 +1,62 @@
 <template>
     <div>
-        <nav>
-        <RouterLink :to="{name: 'board'}">board</RouterLink> |
-        <RouterLink :to="{name: 'chat'}">chat</RouterLink> |
-        <RouterLink :to="{name: 'board'}">running</RouterLink> |
-        <RouterLink
-            :to="{ name: 'myPage', params: { userId: userAuthStore.userId } }"
-            :key="userAuthStore.userId">myPage</RouterLink>
-        </nav>
-        <RouterView/>
+      <nav class="icon-nav">
+        <!-- Board 버튼 -->
+        <RouterLink :to="{ name: 'board' }" class="icon-link">
+          <img src="@/assets/menu/Home.png" alt="Board" />
+        </RouterLink>
+  
+        <!-- Chat 버튼 -->
+        <RouterLink :to="{ name: 'chat' }" class="icon-link">
+          <img src="@/assets/menu/Chat.png" alt="Chat" />
+        </RouterLink>
+  
+        <!-- Run 버튼 -->
+        <RouterLink :to="{ name: 'board' }" class="icon-link">
+          <img src="@/assets/menu/Run.png" alt="Run" />
+        </RouterLink>
+  
+        <!-- MyPage 버튼 -->
+        <RouterLink 
+          :to="{ name: 'myPage', params: { userId: userAuthStore.userId } }" 
+          :key="userAuthStore.userId" 
+          class="icon-link"
+        >
+          <img src="@/assets/menu/Profile.png" alt="My Page" />
+        </RouterLink>
+      </nav>
     </div>
-</template>
-
-<script setup>
-import { useUserAuthStore } from "@/stores/userAuth";
-const userAuthStore = useUserAuthStore();
-</script>
-
-<style scoped>
-    nav {
-        text-align: center;
-    }
-    nav a {
-        font-weight: bold;
-        text-decoration: none;
-        color: black;
-    }
-    nav a.router-link-exact-active {
-        color: darkgoldenrod;
-    }
-</style>
+  </template>
+  
+  <script setup>
+  import { useUserAuthStore } from "@/stores/userAuth";
+  const userAuthStore = useUserAuthStore();
+  </script>
+  
+  <style scoped>
+  /* 네비게이션 스타일 */
+  .icon-nav {
+    display: flex;
+    justify-content: space-between; /* 버튼 간격 균등 배치 */
+    align-items: center; /* 세로 정렬 */
+    width: 100%; /* 네비게이션 전체 너비 */
+    margin: 20px 0;
+  }
+  
+  .icon-link {
+    flex: 1; /* 각 버튼이 동일한 크기로 나눠짐 */
+    text-align: center; /* 버튼을 가운데 정렬 */
+  }
+  
+  .icon-link img {
+    width: 40px; /* 버튼 크기 조정 */
+    height: 40px;
+    cursor: pointer;
+    transition: transform 0.2s ease; /* 호버 시 애니메이션 효과 */
+  }
+  
+  .icon-link img:hover {
+    transform: scale(1.3); /* 확대 효과 */
+  }
+  </style>
+  

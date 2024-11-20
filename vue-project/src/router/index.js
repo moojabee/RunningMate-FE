@@ -26,12 +26,19 @@ const router = createRouter({
       path:'/',
       name:'main',
       component: MainView,
+            redirect: () => {
+        // session이 없으면 로그인 페이지로 리다이렉트
+        if (!sessionStorage.getItem('session')) {
+          return { name: 'userAuth' };
+        }
+        return { name: 'board' }; // 세션이 있을 경우 메인 페이지로 이동
+      },
       children: [
         {
           path: '/board',
           name: 'board',
           component: BoardView,
-          redirect: { name: 'followBoardList' },
+          redirect: { name: 'neighborBoardList' },
           children: [
             {
               path: 'follow',
@@ -112,6 +119,7 @@ const router = createRouter({
       path: '/userAuth',
       name: 'userAuth',
       component: UserAuthView,
+      redirect: {name : 'login'},
       children: [
         {
           path: '',

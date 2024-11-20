@@ -22,6 +22,7 @@
           placeholder="이메일 입력" 
           v-model.trim="registInfo.email" 
           class="input-field"
+          @keyup.enter="isValidEmail"
         />
         <span class="validation-message" :style="{ color: vaildEmail === '가능' ? 'green' : 'red' }">
           {{ vaildEmail }}
@@ -57,6 +58,7 @@
           placeholder="닉네임 입력" 
           v-model.trim="registInfo.nickname" 
           class="input-field"
+          @keyup.enter="isValidNickname"
         />
         <span class="validation-message" :style="{ color: vaildNickname === '가능' ? 'green' : 'red' }">
           {{ vaildNickname }}
