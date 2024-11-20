@@ -76,7 +76,41 @@ export const useChatRoomStore = defineStore('chatRoom', () => {
         .catch((err)=>{
             console.log(party)
         })
-
     }
-    return {loadChatRoomList,loadOpenChatRoomList,createChatRoom,chatRoomList,openChatRoomList,joinChatRoom};
+
+    // 채팅방 나가기
+    const leaveChatRoom = function(party){
+        console.log(party.roomId)
+        axios({
+            url:`${REST_API_URL}/leave-room`,
+            method:'DELETE',
+            data:  party ,
+            headers:getAuthHeaders(),
+        })
+        .then((res)=>{
+            chatRoomList.value = chatRoomList.value.filter((room) => room.roomId !== party.roomId);
+            router.push({ name: 'privateChatList'})
+        })
+        .catch((err)=>{
+            console.log(party)
+        })
+    }
+
+    // 채팅 불러오기
+    const chatMessage = ref([]);
+    const loadChatting = function(roomId) {
+        axios.get(`${REST_API_URL}/load-chatting/${roomId}`, {
+            headers: getAuthHeaders(),
+        })
+        .then((res) => {
+            chatMessage.value = res.data;
+        })
+        .catch((err) => {
+            console.log("채팅 불러오기 실패", err);
+        });
+    };
+
+    return {loadChatRoomList,loadOpenChatRoomList,
+        createChatRoom,chatRoomList,openChatRoomList,
+        joinChatRoom,leaveChatRoom,loadChatting, chatMessage};
 })
