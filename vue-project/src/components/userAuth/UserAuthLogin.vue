@@ -32,9 +32,10 @@
             placeholder="비밀번호 입력" 
             v-model.trim="password" 
             class="input-field"
+             @keyup.enter="login"
           />
         </div>
-        <button class="login-button" @click="login">
+        <button class="login-button" type="button" @click="login" >
           Login
         </button>
         <div class="link-group">
