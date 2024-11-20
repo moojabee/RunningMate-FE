@@ -18,6 +18,7 @@ import MyBoard from '@/components/myPage/MyBoard.vue'
 import MyRun from '@/components/myPage/MyRun.vue'
 import ChatEntryRoom from '@/components/chat/ChatEntryRoom.vue'
 import MyBoardUpdate from '@/components/myPage/MyBoardUpdate.vue'
+import MyPageUpdate from '@/components/myPage/MyPageUpdate.vue'
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -112,6 +113,11 @@ const router = createRouter({
               component: MyBoardUpdate
             },
           ]
+        },
+        {
+          path: "MyPageUpdate/:userId",
+          name: "MyPageUpdate",
+          component: MyPageUpdate
         },
       ]
     },
