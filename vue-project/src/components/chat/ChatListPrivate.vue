@@ -2,20 +2,36 @@
     <div class="chat-room-container">
         <template v-for="room in store.chatRoomList" :key="room.roomId">
             <div class="chat-room-card" @click="enterChatRoom(room.roomId, room.roomName)">
+                <!-- 채팅방 사진과 텍스트 -->
                 <div class="chat-room-info">
                     <!-- 동그란 채팅방 사진 -->
                     <img src="@/assets/default-profile.png" alt="Room Image" class="chat-room-image" />
-                    <span class="chat-room-name">
-                        {{ room.roomName }}
-                    </span>
+
+                    <!-- 방 이름과 최근 메시지 -->
+                    <div class="chat-room-text">
+                        <!-- 채팅방 이름 -->
+                        <span class="chat-room-name">
+                            {{ room.roomName }}
+                        </span>
+
+                        <!-- 최근 메시지 -->
+                        <span class="last-chat-content">
+                            {{ room.lastChat ? room.lastChat.content : '' }}
+                        </span>
+                    </div>
                 </div>
-                <button class="leave-button" @click.stop="leaveChatRoom(room)">나가기</button>
+
+                <!-- 나가기 버튼과 시간 -->
+                <div class="chat-room-actions">
+                    <span class="last-chat-time">
+                        {{ room.lastChat ? formatTime(room.lastChat.sendedDate) : '' }}
+                    </span>
+                    <button class="leave-button" @click.stop="leaveChatRoom(room)">나가기</button>
+                </div>
             </div>
         </template>
     </div>
 </template>
-
-
 
 <script setup>
     import router from '@/router';
@@ -30,6 +46,15 @@
 
     const enterChatRoom = function(roomId, roomName) {
         router.push({ name: 'entryRoom', params: { roomId: roomId, roomName: roomName } });
+    };
+
+    // 시간 포맷팅 메서드 추가
+    const formatTime = (dateString) => {
+        if (!dateString) return ''; // null 체크
+        const date = new Date(dateString);
+        const hours = String(date.getHours()).padStart(2, '0'); // 시 (2자리)
+        const minutes = String(date.getMinutes()).padStart(2, '0'); // 분 (2자리)
+        return `${hours}:${minutes}`; // HH:mm 형식 반환
     };
 
     import Swal from "sweetalert2"; // SweetAlert2 가져오기
@@ -81,10 +106,9 @@ hr {
     background: #ddd;
 }
 
-/* 카드 스타일 */
 .chat-room-card {
     display: flex;
-    justify-content: space-between;
+    justify-content: space-between; /* 사진과 나가기 버튼 간격 유지 */
     align-items: center;
     padding: 10px 15px;
     margin-bottom: 15px;
@@ -93,6 +117,7 @@ hr {
     border-radius: 10px;
     box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
     cursor: pointer;
+    position: relative; /* 시간 위치 조정을 위해 필요 */
     transition: transform 0.2s, box-shadow 0.2s;
 }
 
@@ -101,35 +126,61 @@ hr {
     box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15);
 }
 
-/* 채팅방 정보 */
 .chat-room-info {
     display: flex;
-    align-items: center;
-    cursor: pointer;
+    align-items: center; /* 사진과 텍스트를 수평으로 정렬 */
 }
 
-/* 동그란 채팅방 사진 */
 .chat-room-image {
     width: 50px;
     height: 50px;
     border-radius: 50%;
-    margin-right: 15px;
+    margin-right: 15px; /* 이미지와 텍스트 간격 추가 */
     object-fit: cover; /* 이미지 비율 유지 */
     border: 1px solid #ddd;
 }
 
-/* 채팅방 이름 */
-.chat-room-name {
-    font-size: 0.7em;
-    color: #555;
-    font-weight: bold;
-    white-space: nowrap; /* 한 줄로 표시 */
-    overflow: hidden; /* 넘친 텍스트 숨김 */
-    text-overflow: ellipsis; /* 넘친 텍스트를 '...'으로 표시 */
-    max-width: 150px; /* 텍스트가 차지할 최대 너비 설정 */
+.chat-room-text {
+    display: flex;
+    flex-direction: column; /* 제목과 내용을 세로로 정렬 */
+    align-items: flex-start; /* 왼쪽 정렬 */
 }
 
-/* 나가기 버튼 */
+.chat-room-name {
+    font-size: 1em; /* 채팅방 이름 크기 */
+    font-weight: bold;
+    color: #ff4d4d;
+    margin-bottom: 5px; /* 이름과 내용 간격 추가 */
+    white-space: nowrap; /* 한 줄로 표시 */
+    overflow: hidden; /* 넘치는 내용 숨김 */
+    text-overflow: ellipsis; /* 넘치는 내용에 '...' 표시 */
+    max-width: 10em; /* 제목 길이를 제한하는 최대 너비 */
+}
+
+.last-chat-content {
+    font-size: 0.5em; /* 최근 메시지는 작게 */
+    color: #555;
+    white-space: nowrap; /* 한 줄로 표시 */
+    overflow: hidden; /* 넘치는 내용 숨김 */
+    text-overflow: ellipsis; /* 넘치는 내용에 '...' 표시 */
+    max-width: 18em; /* 내용 길이를 제한하는 최대 너비 */
+}
+.chat-room-actions {
+    display: flex;
+    align-items: center;
+    position: absolute; /* 나가기 버튼과 시간을 하단 고정 */
+    bottom: 10px;
+    right: 15px;
+}
+
+.last-chat-time {
+    font-size: 0.5em; /* 시간은 작게 */
+    color: #555;
+    margin-right: 10px; /* 시간과 버튼 간격 추가 */
+    position: relative; /* 상대적 위치 조정 */
+    top: 5px; /* 아래로 5px 이동 */
+}
+
 .leave-button {
     padding: 5px 10px;
     background-color: #ff4d4d;

@@ -19,6 +19,7 @@ export const useChatRoomStore = defineStore('chatRoom', () => {
             headers:getAuthHeaders(),
         })
         .then((res)=>{
+            console.log(res.data);
             chatRoomList.value = res.data
         })  
         .catch((error)=>{
