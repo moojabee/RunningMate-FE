@@ -30,40 +30,50 @@ import TheHeaderNav from '@/components/common/TheHeaderNav.vue';
 }
 
 /* 전체 레이아웃 컨테이너 */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+/* 전체 레이아웃 컨테이너 */
 .app-container {
   display: flex;
   flex-direction: column;
   height: 100vh; /* 화면 전체 높이 */
+  overflow: hidden; /* 불필요한 스크롤 제거 */
 }
 
 /* 헤더 스타일 */
 .header {
-  flex: 1; /* 높이 비율 1 */
+  height: 50px; /* 고정된 높이 */
   position: fixed; /* 화면 상단에 고정 */
+  top: 0;
+  left: 0;
   width: 100%;
   background-color: #f8f8f8; /* 배경색 */
-  z-index: 1000; /* 상단에 표시되도록 설정 */
+  z-index: 1000; /* 다른 요소보다 위에 표시 */
   border-bottom: 1px solid #ccc; /* 구분선 */
-  text-align: right;
 }
 
 /* 라우터 콘텐츠 영역 */
 .main-content {
-  flex: 3; /* 높이 비율 3 */
-  margin-top: 50px; /* 헤더 높이만큼 여백 추가 */
-  margin-bottom: 80px; /* 푸터 높이만큼 여백 추가 */
-  overflow-y: auto; /* 콘텐츠가 많을 경우 스크롤 활성화 */
+  flex: 1; /* 헤더와 푸터를 제외한 영역 차지 */
+  margin-top: 50px; /* 헤더 높이 */
+  margin-bottom: 80px; /* 푸터 높이 */
+  overflow: hidden; /* 스크롤 제거 */
+  position: relative; /* 내부 요소 위치 조정 가능 */
 }
 
 /* 푸터 스타일 */
 .footer {
-  flex: 1; /* 높이 비율 1 */
+  height: 80px; /* 고정된 높이 */
   position: fixed; /* 화면 하단에 고정 */
   bottom: 0;
   left: 0;
   width: 100%;
   background-color: #f8f8f8; /* 배경색 */
-  z-index: 1000; /* 상단에 표시되도록 설정 */
+  z-index: 1000; /* 다른 요소보다 위에 표시 */
   border-top: 1px solid #ccc; /* 구분선 */
 }
 </style>
