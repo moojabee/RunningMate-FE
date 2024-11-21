@@ -52,7 +52,7 @@
     width: 40px; /* 버튼 크기 조정 */
     height: 40px;
     cursor: pointer;
-    transition: transform 0.2s ease; /* 호버 시 애니메이션 효과 */
+    transition: transform 0.3s ease; /* 호버 시 애니메이션 효과 */
   }
   
   .icon-link img:hover {

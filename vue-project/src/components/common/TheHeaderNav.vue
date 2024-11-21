@@ -11,7 +11,7 @@
   
       <!-- 사용자 이름과 로그아웃 버튼 -->
       <div class="user-info">
-        <span>{{ userId }}님</span>
+        <span>{{ userNickname }}님</span>
         <button @click="userAuthStore.logout" class="logout-button">로그아웃</button>
       </div>
     </div>
@@ -21,7 +21,7 @@
   import { useUserAuthStore } from '@/stores/userAuth';
   
   const userAuthStore = useUserAuthStore();
-  const userId = sessionStorage.getItem('userId');
+  const userNickname = sessionStorage.getItem('userNickname');
   </script>
   
   <style scoped>

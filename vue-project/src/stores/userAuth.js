@@ -8,6 +8,7 @@ const REST_API_URL=import.meta.env.VITE_REST_API_URL
 
 export const useUserAuthStore = defineStore('userAuth', () => {
     
+    const user = ref({});
     const userId = ref(0);
     const token = ref('');
 
@@ -32,14 +33,17 @@ export const useUserAuthStore = defineStore('userAuth', () => {
           })
           .then((res) => {
             // 로그인 성공 처리
-            userId.value = res.data;
+            console.log(res.data)
+            user.value = res.data;
             token.value = res.headers['authorization'];
-            sessionStorage.setItem('userId', userId.value);
+            sessionStorage.setItem('userId', user.value.userId);
+            userId.value = user.value.userId;
+            sessionStorage.setItem('userNickname',user.value.nickname)
             sessionStorage.setItem('session', token.value);
             Swal.fire({
               icon: 'success',
               title: '로그인 성공',
-              text: `${userId.value}님 안녕하세요!`,
+              text: `${user.value.nickname}님 안녕하세요!`,
             }).then(() => {
               router.push({ name: 'main' }); // 성공 시 메인 페이지로 이동
             });
@@ -56,8 +60,9 @@ export const useUserAuthStore = defineStore('userAuth', () => {
       };
 
     const logout = function(){
-        userId.value = 0
+        user.value = {}
         sessionStorage.removeItem('userId')
+        sessionStorage.removeItem('userNickname')
         sessionStorage.removeItem('session')
         router.push({name:'login'})
     }
@@ -112,5 +117,5 @@ export const useUserAuthStore = defineStore('userAuth', () => {
           });
       };
 
-    return { login, logout, findPassword, regist, userId}
+    return { login, logout, findPassword, regist, userId,user}
 })

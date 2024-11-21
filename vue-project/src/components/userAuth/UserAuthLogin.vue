@@ -68,12 +68,6 @@
     }
     userAuthStore.login(email.value, password.value);
   };
-  
-  onMounted(() => {
-    if (sessionStorage.getItem('session')) {
-      router.push('/main'); // main으로 리다이렉트
-    }
-  });
   </script>
   
   <style scoped>
