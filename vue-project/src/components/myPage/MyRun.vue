@@ -13,7 +13,7 @@
       </thead>
       <tbody>
         <tr v-for="run in runs" :key="run.recordId">
-          <td>{{ run.recordId }}</td>
+          <td>{{ run.runId }}</td>
           <td>{{ run.dist }}</td>
           <td>{{ run.pace }}</td>
           <td>{{ run.startTime }}</td>
