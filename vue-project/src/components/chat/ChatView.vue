@@ -67,8 +67,6 @@
 .chat-content {
   flex: 1; /* 남은 공간을 채움 */
   overflow-y: auto; /* 스크롤 가능 */
-  padding: 20px; /* 내부 여백 */
-  background-color: #f9f9f9; /* 배경색 */
 }
 
 </style>
