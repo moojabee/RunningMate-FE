@@ -1,99 +1,81 @@
 <template>
-  <div>
-    <h4>동네 게시글 목록</h4>
-    <hr>
-    <table>
-      <thead>
-        <tr>
-          <th>userId</th>
-          <th>프로필사진</th>
-          <th>닉네임</th>
-          <th>총 거리</th>
-          <th>평균 페이스</th>
-          <th>내용</th>
-          <th>댓글 수</th>
-          <th>좋아요 수</th>
-          <th>좋아요</th>
-          <th>댓글 확인</th>
-          <th>등록일</th>
-          <th>이미지</th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr v-for="board in store.neighborBoardList" :key="board.id">
-          <td>{{ board.userId }}</td>
-          <td>
-            <!-- 프로필 이미지 -->
-            <img
-              v-if="board.userImg"
-              :src="board.userImg"
-              alt="프로필 이미지"
-              style="width: 50px; height: 50px; object-fit: cover; border-radius: 20%;"
-            />
-            <img
-              v-else
-              src="@/assets/default-profile.png"
-              alt="기본 프로필 이미지"
-              style="width: 50px; height: 50px; object-fit: cover; border-radius: 20%;"
-            />
-          </td>
-          <td>
-            <!-- 닉네임 클릭 시 myPage로 이동 -->
-            <RouterLink :to="{ name: 'myPage', params: { userId: board.userId } }">
-              {{ board.nickname }}
-            </RouterLink>
-          </td>
-          <td>{{ board.userDist }}km</td>
-          <td>{{ board.userPace }}</td>
-          <td>{{ board.content }}</td>
-          <td>
-            🗨 {{ board.comment.length }}
-          </td>
-          <td>❤ {{ board.like.length }}</td>
-          <td>
-            <!-- 좋아요 버튼 -->
-            <button :disabled="isLoading" @click="toggleLike(board)">
-              <span v-if="board.likeCheck === 1">💖</span>
-              <span v-else>🤍</span>
-            </button>
-          </td>
-          <td>
-            <button @click="openCommentModal(board)">댓글 {{ board.comment.length }}개 보기</button>
-          </td>
-          <td>{{ board.postedDate }}</td>
-          <td>
-            <div v-if="board.boardImg && board.boardImg.length > 0">
-              <img
-                v-for="img in board.boardImg"
-                :key="img.imgId"
-                :src="img.boardUrl"
-                alt="게시글 이미지"
-                style="width: 100px; height: auto; margin: 4px;"
-              />
-            </div>
-            <span v-else>이미지 없음</span>
-          </td>
-          <td>
-            <button @click="handleActions(board)">...</button>
-            <div v-show="visibleActions[board.boardId]" style="margin-top: 5px;">
-              <button @click="goToUpdatePage(board)">수정</button>
-              <button @click="confirmDelete(board.boardId)">삭제</button>
-            </div>
-          </td>
-        </tr>
-      </tbody>
-    </table>
+  <div class="post-list" @click="closeAllMenus">
+    <div v-for="board in store.neighborBoardList" :key="board.id" class="post-card">
+      <!-- 유저 정보 -->
+      <div class="post-header">
+        <img
+          v-if="board.userImg"
+          :src="board.userImg"
+          alt="프로필 이미지"
+          class="profile-img"
+        />
+        <img
+          v-else
+          src="@/assets/default-profile.png"
+          alt="기본 프로필 이미지"
+          class="profile-img"
+        />
+        <div class="user-info">
+          <h4>{{ board.nickname }}</h4>
+          <p>{{ board.userDist }}km {{ board.userPace }}</p>
+        </div>
+        <!-- ... 버튼: 본인이 작성한 게시글만 보이도록 설정 -->
+        <button class="more-button" @click.stop="handleActions(board)">...</button>
+      </div>
 
+      <!-- 수정/삭제 메뉴: 본인 게시글에서만 보이며 다른 구성 요소에 영향을 주지 않음 -->
+      <div
+        v-show="visibleActions[board.boardId]"
+        class="action-menu"
+        @click.stop
+      >
+        <button @click="goToUpdatePage(board)">게시글 수정</button>
+        <button @click="confirmDelete(board.boardId)">게시글 삭제</button>
+      </div>
+
+      <!-- 러닝 이미지 -->
+      <div class="post-image">
+        <img
+          v-for="img in board.boardImg"
+          :key="img.imgId"
+          :src="img.boardUrl"
+          alt="게시글 이미지"
+        />
+      </div>
+
+      <!-- 게시글 내용 -->
+      <div class="post-body">
+        <p>{{ board.content }}</p>
+      </div>
+
+      <!-- 하단 액션 -->
+      <div class="post-footer">
+        <div class="like-comment">
+          <button @click="toggleLike(board)" class="like-button">
+            <span v-if="board.likeCheck === 1">💖</span>
+            <span v-else>🤍</span>
+          </button>
+          <span>{{ board.like.length }}</span>
+          <span>💬 {{ board.comment.length }}</span>
+        </div>
+        <button @click="openCommentModal(board)" class="comment-link">
+          댓글 {{ board.comment.length }}개 보기
+        </button>
+        <p class="timestamp">{{ formatTimestamp(board.postedDate) }}</p>
+      </div>
+    </div>
     <!-- 댓글 모달 -->
     <CommentView
       v-if="isCommentModalVisible"
       :isVisible="isCommentModalVisible"
       :boardId="selectedBoardId"
       @close="isCommentModalVisible = false"
+      @updateModalVisibility="$emit('updateModalVisibility', $event)"
       @updateCommentCount="updateCommentCount"
     />
-</div>
+  </div>
 </template>
+
 
 <script setup>
 import { ref, reactive, onMounted } from 'vue';
@@ -138,20 +120,27 @@ const confirmDelete = (boardId) => {
   }
 };
 
-// 수정/삭제 버튼 가시성을 관리하는 상태
+// 게시글 액션 메뉴 가시성 관리
 const visibleActions = reactive({});
 
-// 액션 버튼 클릭 처리 (작성자 확인)
+const closeAllMenus = () => {
+  Object.keys(visibleActions).forEach((key) => {
+    visibleActions[key] = false;
+  });
+};
+
 const handleActions = async (board) => {
-  const check = await store.userCheck(board.userId);
-  if (check) {
-    // 작성자가 맞으면 가시성을 토글
-    if (visibleActions[board.boardId]) {
-      visibleActions[board.boardId] = false; // 숨기기
+  try {
+    // 작성자인지 확인
+    const isAuthor = await store.userCheck(board.userId);
+    if (isAuthor) {
+      // 작성자인 경우 메뉴 표시
+      closeAllMenus(); // 다른 메뉴 닫기
+      visibleActions[board.boardId] = true;
     } else {
-      visibleActions[board.boardId] = true; // 보이기
     }
-  } else {
+  } catch (error) {
+    console.error("작성자 확인 중 오류 발생:", error);
   }
 };
 
@@ -184,6 +173,26 @@ const toggleLike = async (board) => {
   }
 };
 
+// 작성 시간 포맷 함수
+const formatTimestamp = (postedDate) => {
+  const now = new Date();
+  const postedTime = new Date(postedDate);
+  const diffInMs = now - postedTime;
+
+  const diffInMinutes = Math.floor(diffInMs / (1000 * 60));
+  const diffInHours = Math.floor(diffInMinutes / 60);
+  const diffInDays = Math.floor(diffInHours / 24);
+
+  if (diffInMinutes < 60) {
+    return `${diffInMinutes}분 전`;
+  } else if (diffInHours < 24) {
+    return `${diffInHours}시간 전`;
+  } else {
+    return `${diffInDays}일 전`;
+  }
+};
+
+
 // 페이지 마운트 시 게시글 목록 가져오기
 onMounted(() => {
   store.getNeighborBoardList();
@@ -191,13 +200,152 @@ onMounted(() => {
 </script>
 
 <style scoped>
-nav {
-  margin-bottom: 1rem;
+/* 게시글 리스트 컨테이너 */
+.post-list {
+  padding: 10px;
+  overflow-y: auto;
 }
-table {
-  text-align: center;
+
+/* 게시글 카드 */
+.post-card {
+  background-color: white;
+  border-radius: 10px;
+  margin-bottom: 15px;
+  padding: 15px;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+  position: relative; /* ... 버튼의 위치 조정을 위해 필요 */
 }
-button {
-  margin-left: 5px;
+
+/* 게시글 상단 정보 */
+.post-header {
+  display: flex;
+  align-items: center;
+  margin-bottom: 10px;
+  position: relative; /* ... 버튼 위치 조정 */
+}
+
+.profile-img {
+  width: 50px;
+  height: 50px;
+  border-radius: 20%;
+  object-fit: cover;
+  margin-right: 10px;
+}
+
+.user-info h4 {
+  margin: 0;
+  font-size: 1.1rem;
+  color: #333;
+}
+
+.user-info p {
+  margin: 5px 0 0;
+  font-size: 0.9rem;
+  color: #888;
+}
+
+.more-button {
+  position: absolute; /* 우측 상단 고정 */
+  top: 0;
+  right: 0;
+  background: none;
+  border: none;
+  font-size: 1.2rem;
+  cursor: pointer;
+}
+
+/* 수정/삭제 메뉴 */
+.action-menu {
+  position: absolute;
+  top: 30px;
+  right: 10px;
+  background-color: white;
+  border: 1px solid #ddd;
+  border-radius: 5px;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+  z-index: 100;
+  display: flex;
+  flex-direction: column;
+  padding: 5px;
+}
+
+.action-menu button {
+  background: none;
+  border: none;
+  text-align: left;
+  padding: 10px;
+  font-size: 0.9rem;
+  color: #333;
+  cursor: pointer;
+}
+
+.action-menu button:hover {
+  background-color: #f5f5f5;
+}
+
+/* 게시글 이미지 */
+.post-image img {
+  width: 100%;
+  border-radius: 10px;
+  margin-top: 10px;
+}
+
+/* 게시글 내용 */
+.post-body p {
+  margin: 10px 0;
+  font-size: 1.0rem;
+  color: #444;
+}
+
+/* 하단 액션 */
+.post-footer {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  margin-top: 10px;
+}
+
+.like-comment {
+  display: flex;
+  gap: 10px;
+  font-size: 0.9rem;
+  color: #666;
+}
+
+.like-comment span {
+  display: flex;
+  align-items: center;
+}
+
+.like-button {
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-size: 1.2rem;
+}
+
+.like-button span {
+  font-size: 1.2rem;
+}
+
+.comment-link {
+  background: none;
+  border: none;
+  color: #aaa; /* 작성 시간과 같은 색상 */
+  font-size: 0.9rem;
+  text-decoration: none;
+  cursor: pointer; /* 버튼임을 명시 */
+  margin-top: 5px;
+  padding: 0;
+}
+
+.comment-link:hover {
+  text-decoration: underline; /* 호버 시 강조 효과 */
+}
+
+.timestamp {
+  font-size: 0.8rem;
+  color: #aaa;
+  margin-top: 5px;
 }
 </style>
