@@ -66,7 +66,7 @@
               <img
                 v-for="img in board.boardImg"
                 :key="img.imgId"
-                :src="img.fileName"
+                :src="img.boardUrl"
                 alt="게시글 이미지"
                 style="width: 100px; height: auto; margin: 4px;"
               />
