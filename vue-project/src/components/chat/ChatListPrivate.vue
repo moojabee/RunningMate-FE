@@ -1,15 +1,15 @@
 <template>
     <div class="chat-room-container">
         <template v-for="room in store.chatRoomList" :key="room.roomId">
-            <div class="chat-room-card">
-                <div class="chat-room-info" @click="enterChatRoom(room.roomId, room.roomName)">
+            <div class="chat-room-card" @click="enterChatRoom(room.roomId, room.roomName)">
+                <div class="chat-room-info">
                     <!-- 동그란 채팅방 사진 -->
                     <img src="@/assets/default-profile.png" alt="Room Image" class="chat-room-image" />
                     <span class="chat-room-name">
                         {{ room.roomName }}
                     </span>
                 </div>
-                <button class="leave-button" @click="leaveChatRoom(room)">나가기</button>
+                <button class="leave-button" @click.stop="leaveChatRoom(room)">나가기</button>
             </div>
         </template>
     </div>
