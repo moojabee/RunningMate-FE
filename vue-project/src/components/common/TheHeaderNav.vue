@@ -1,13 +1,13 @@
 <template>
     <div class="header-container">
       <!-- 로고 -->
-      <span class="image-logo-container">
+      <button class="image-logo-container" @click="goHome">
         <img 
           src="@/assets/logo.png" 
           alt="Company Logo" 
           class="company-logo" 
         />
-      </span>
+      </button>
   
       <!-- 사용자 이름과 로그아웃 버튼 -->
       <div class="user-info">
@@ -18,10 +18,15 @@
   </template>
   
   <script setup>
+  import router from '@/router';
   import { useUserAuthStore } from '@/stores/userAuth';
   
   const userAuthStore = useUserAuthStore();
   const userNickname = sessionStorage.getItem('userNickname');
+  
+  const goHome = function(){
+    router.push({name:"main"});
+  }
   </script>
   
   <style scoped>
@@ -39,6 +44,8 @@
   .image-logo-container {
     display: flex;
     align-items: center;
+    all: unset; /* 버튼의 기본 스타일 제거 */
+    cursor: pointer; /* 클릭 가능 표시 */
   }
   
   .company-logo {
@@ -57,7 +64,7 @@
     padding: 5px 10px;
     font-size: 14px;
     color: white;
-    background-color: #007bff;
+    background-color: #ff5722;
     border: none;
     border-radius: 5px;
     cursor: pointer;
@@ -65,7 +72,7 @@
   }
   
   .logout-button:hover {
-    background-color: #0056b3;
+    background-color: #ff5722;
   }
   </style>
   

@@ -59,14 +59,32 @@ export const useUserAuthStore = defineStore('userAuth', () => {
           });
       };
 
-    const logout = function(){
-        user.value = {}
-        sessionStorage.removeItem('userId')
-        sessionStorage.removeItem('userNickname')
-        sessionStorage.removeItem('session')
-        router.push({name:'login'})
-    }
-
+      const logout = function () {
+        Swal.fire({
+          title: "로그아웃 하시겠습니까?",
+          icon: "warning",
+          showCancelButton: true,
+          confirmButtonText: "로그아웃",
+          cancelButtonText: "취소",
+          reverseButtons: true,
+        }).then((result) => {
+          if (result.isConfirmed) {
+            user.value = {};
+            sessionStorage.removeItem("userId");
+            sessionStorage.removeItem("userNickname");
+            sessionStorage.removeItem("session");
+            router.push({ name: "login" });
+      
+            Swal.fire({
+              title: "로그아웃 완료!",
+              text: "로그아웃되었습니다.",
+              icon: "success",
+              timer: 2000,
+              showConfirmButton: false,
+            });
+          }
+        });
+      };
     const findPassword = function(email){
         // 요청 중 로딩 표시
         showLoading('잠시만 기다려 주세요...', '비밀번호 변경 요청을 처리 중입니다.');

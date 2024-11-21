@@ -3,17 +3,20 @@
       <nav class="icon-nav">
         <!-- Board 버튼 -->
         <RouterLink :to="{ name: 'board' }" class="icon-link">
-          <img src="@/assets/menu/Home.png" alt="Board" />
+          <img src="@/assets/menu/Home.png" 
+           style="width: 32px; height: 32px; object-fit: cover" alt="Board" />
         </RouterLink>
   
         <!-- Chat 버튼 -->
         <RouterLink :to="{ name: 'chat' }" class="icon-link">
-          <img src="@/assets/menu/Chat.png" alt="Chat" />
+          <img src="@/assets/menu/Chat.png"
+          style="width: 30px; height: 30px; object-fit: cover"  alt="Chat" />
         </RouterLink>
   
         <!-- Run 버튼 -->
         <RouterLink :to="{ name: 'board' }" class="icon-link">
-          <img src="@/assets/menu/Run.png" alt="Run" />
+          <img src="@/assets/menu/Run.png" alt="Run"
+          style="width: 35px; height: 35px; object-fit: cover"  />
         </RouterLink>
   
         <!-- MyPage 버튼 -->
@@ -22,7 +25,8 @@
           :key="userAuthStore.userId" 
           class="icon-link"
         >
-          <img src="@/assets/menu/Profile.png" alt="My Page" />
+          <img src="@/assets/menu/Profile.png" alt="My Page"
+          style="width: 35px; height: 35px; object-fit: cover"  />
         </RouterLink>
       </nav>
     </div>
