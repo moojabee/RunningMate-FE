@@ -6,17 +6,38 @@
         <img src="@/assets/chat/back.png" alt="뒤로" class="back-icon" />
       </button>
       <h2 class="room-title">{{ roomName }}</h2>
+      <button class="menu-button" @click="goBack">
+        <img src="@/assets/chat/menu.png" alt="뒤로" class="menu-icon" />
+      </button>
     </header>
 
     <!-- 채팅 리스트 -->
     <ul class="chat-list" ref="messageList">
+      
       <li
         class="list-group-item"
         v-for="(msg, index) in messages"
         :key="index"
-        :class="{ 'my-message': msg.userId == userId, 'other-message': msg.userId != userId, 'notice': msg.userId == '[알림]' }"
-      >
-        <!-- 시간 -->
+        :class="{ 'my-message': msg.userId == userId, 'other-message': msg.userId != userId, 'notice': msg.userId == '[알림]' }">
+        
+        <div class="sender-info" v-if="msg.userId != userId" >
+          <img
+              v-if="msg.userImg"
+              :src="msg.userImg"
+              alt="프로필 이미지"
+              style="width: 30px; height: 30px; object-fit: cover; border-radius: 20%;"
+            />
+            <img
+              v-else
+              src="@/assets/default-profile.png"
+              alt="기본 프로필 이미지"
+              style="width: 30px; height: 30px; object-fit: cover; border-radius: 20%;"
+        />
+        <span class="nickname">
+          {{ msg.nickname }}
+        </span>
+        </div>
+
         <span
           class="message-time"
           :class="{ 'time-my-message': msg.userId == userId, 'time-other-message': msg.userId != userId }"
@@ -24,7 +45,7 @@
           {{ formatTime(msg.sendedDate) }}
         </span>
         <!-- 메시지 내용 -->
-        <span class="message-user">{{ msg.content }}</span>
+        <div class="message-box">{{ msg.content }}</div>
       </li>
     </ul>
 
@@ -76,7 +97,7 @@ const formatTime = (dateTime) => {
   const hours = String(date.getHours()).padStart(2, '0');
   const minutes = String(date.getMinutes()).padStart(2, '0');
   const seconds = String(date.getSeconds()).padStart(2, '0');
-  return `${hours}:${minutes}:${seconds}`;
+  return `${hours}:${minutes}`;
 };
 
 const goBack = () => {
@@ -144,10 +165,13 @@ const sendMessage = () => {
 
 // 메시지 수신 처리 함수
 const recvMessage = (receivedMessage) => {
+  console.log(receivedMessage)
   messages.value.push({
     userId: receivedMessage.messageType == 'ENTER' ? '[알림]' : receivedMessage.userId,
     content: receivedMessage.content,
     sendedDate: receivedMessage.sendedDate,
+    userImg: receivedMessage.userImg,
+    nickname:receivedMessage.nickname
   });
 
   nextTick(() => scrollToBottom());
@@ -165,6 +189,7 @@ const loadPreviousChats = async () => {
   try {
     await chatRoomStore.loadChatting(roomId.value);
     messages.value = chatRoomStore.chatMessage;
+    nextTick(() => scrollToBottom());
   } catch (error) {
     console.error('이전 채팅 로드 실패:', error);
   }
@@ -179,6 +204,7 @@ onUnmounted(()=>{
   disconnect();
 });
 </script>
+
 <style scoped>
 /* 기본 스타일 */
 * {
@@ -186,12 +212,11 @@ onUnmounted(()=>{
   padding: 0;
   box-sizing: border-box;
 }
-
 .chat-container {
-  height: 100vh;
   display: flex;
-  flex-direction: column;
   overflow: hidden;
+  flex-direction: column;
+  height: 100vh; /* 화면 전체 높이 */
 }
 
 /* 헤더 스타일 */
@@ -201,89 +226,20 @@ onUnmounted(()=>{
   z-index: 10;
   display: flex;
   align-items: center;
-  justify-content: space-between;
   padding: 10px 15px;
   background-color: #f8f9fa;
   border-bottom: 1px solid #ddd;
-  height: 60px; /* 고정 높이 */
-}
-
-.back-button {
-  background-color: transparent;
-  border: none;
-  padding: 0;
-}
-
-.back-icon {
-  width: 40px;
-  height: 40px;
-}
-
-/* 채팅 리스트 스타일 */
-.chat-list {
-  flex: 1;
-  overflow-y: auto;
-  background-color: #b2c7d9; /* 배경색 유지 */
-  padding: 10px;
-  list-style: none;
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-  max-height: calc(100vh - 120px); /* 헤더(60px) + 푸터(60px)를 제외한 높이 */
-}
-
-/* 메시지가 없을 때 기본 메시지 추가 */
-.chat-list:empty::after {
-  content: '메시지가 없습니다.'; /* 기본 텍스트 */
-  color: #888;
-  text-align: center;
-  font-size: 1rem;
-  width: 100%;
-  display: block;
-  margin-top: 20px;
-}
-
-/* 메시지 스타일 */
-.list-group-item {
-  padding: 10px;
-  border-radius: 5px;
-  background-color: #fee500;
-  max-width: 80%;
-  align-self: flex-start;
-  position: relative; /* 시간 위치 조정 */
-}
-
-.my-message {
-  align-self: flex-end;
-  background-color: #fee500;
-  color: black;
-}
-
-/* 시간 스타일 */
-.message-time {
-  font-size: 0.75rem;
-  color: #555;
-  position: absolute;
-  bottom: 5px;
-}
-
-.time-my-message {
-  left: -50px; /* 내 메시지 시간은 왼쪽 */
-}
-
-.time-other-message {
-  right: -50px; /* 상대 메시지 시간은 오른쪽 */
+  height: 3em; /* 고정 높이 */
 }
 
 /* 푸터 스타일 */
 .chat-footer {
-  position: sticky;
-  bottom: 0;
-  z-index: 10;
+  flex: none; /* 크기를 고정 */
   background-color: #f8f9fa;
   padding: 10px 15px;
   border-top: 1px solid #ddd;
-  height: 60px; /* 고정 높이 */
+  height: 3em; /* 고정 높이 */
+  z-index: 10; /* 다른 요소 위에 표시 */
 }
 
 .input-group {
@@ -309,4 +265,114 @@ onUnmounted(()=>{
 .send-button:hover {
   background-color: #0056b3;
 }
+
+.back-button {
+  background-color: transparent;
+  border: none;
+  padding: 0;
+}
+
+.back-icon {
+  width: 3em;
+  height: 3em;
+}
+
+.menu-icon{
+  width: 2em;
+  height: 2em;
+}
+
+.menu-button {
+  background-color: transparent;
+  border: none;
+  padding: 0;
+  margin-left: auto; /* 버튼을 오른쪽으로 이동 */
+  display: flex; /* 버튼 내부 아이콘 정렬 */
+  align-items: center;
+  justify-content: center;
+}
+
+.room-title{
+  font-size: 0.8em;
+  white-space: nowrap; /* 한 줄로 표시 */
+    overflow: hidden; /* 넘친 텍스트 숨김 */
+    text-overflow: ellipsis; /* 넘친 텍스트를 '...'으로 표시 */
+    max-width: 300px; /* 텍스트가 차지할 최대 너비 설정 */
+}
+
+/* 채팅 리스트 스타일 */
+.chat-list {
+  flex: 1;
+  overflow-y: auto;
+  background-color: #b2c7d9; /* 배경색 유지 */
+  padding: 0.5em;
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  max-height: calc(100vh - 240px); /* 헤더(60px) + 푸터(60px)를 제외한 높이 */
+}
+
+/* 메시지가 없을 때 기본 메시지 추가 */
+.chat-list:empty::after {
+  content: '메시지가 없습니다.'; /* 기본 텍스트 */
+  color: #888;
+  text-align: center;
+  font-size: 1rem;
+  width: 100%;
+  display: block;
+  margin-top: 20px;
+}
+
+/* 메시지 스타일 */
+.list-group-item {
+  position: relative; /* 시간 위치 조정 */
+}
+
+.sender-info {
+  display: flex;
+  align-items: center; /* 이미지와 닉네임을 수직 가운데 정렬 */
+  gap: 5px; /* 이미지와 닉네임 간격 */
+  margin-bottom: 0.2em;
+}
+
+.nickname {
+  font-size: 1rem; /* 닉네임 크기 조정 */
+  line-height: 30px; /* 이미지 높이에 맞춰 텍스트 가운데 정렬 */
+}
+
+.message-box{
+  background-color: #fee500;
+  border-radius: 5px;
+  padding: 10px;
+  max-width: 20em;
+}
+
+.my-message {
+  align-self: flex-end;
+  color: black;
+}
+
+.other-message{
+  align-self: flex-start;
+  color: black;
+}
+
+/* 시간 스타일 */
+.message-time {
+  font-size: 0.75rem;
+  color: #555;
+  position: absolute;
+  bottom: 0;
+}
+
+.time-my-message {
+  left: -35px; /* 내 메시지 시간은 왼쪽 */
+}
+
+.time-other-message {
+  right: -35px; /* 상대 메시지 시간은 오른쪽 */
+}
+
+
 </style>
