@@ -100,7 +100,6 @@ const connect = () => {
       console.error('STOMP 연결 실패: ', error);
     }
   );
-  
     console.log(userId.value);
 };
 
