@@ -20,13 +20,15 @@
 <script setup>
 import TheFooterNav from '@/components/common/TheFooterNav.vue';
 import TheHeaderNav from '@/components/common/TheHeaderNav.vue';
-import { useUserAuthStore } from '@/stores/userAuth';
-
-const userAuthStore = useUserAuthStore();
-const userId = sessionStorage.getItem('userId');
 </script>
 
 <style scoped>
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
 /* 전체 레이아웃 컨테이너 */
 .app-container {
   display: flex;
@@ -38,8 +40,6 @@ const userId = sessionStorage.getItem('userId');
 .header {
   flex: 1; /* 높이 비율 1 */
   position: fixed; /* 화면 상단에 고정 */
-  top: 0;
-  left: 0;
   width: 100%;
   background-color: #f8f8f8; /* 배경색 */
   z-index: 1000; /* 상단에 표시되도록 설정 */
@@ -50,9 +50,8 @@ const userId = sessionStorage.getItem('userId');
 /* 라우터 콘텐츠 영역 */
 .main-content {
   flex: 3; /* 높이 비율 3 */
-  margin-top: 10%; /* 헤더 높이만큼 여백 추가 */
-  margin-bottom: 10%; /* 푸터 높이만큼 여백 추가 */
-  padding: 16px;
+  margin-top: 50px; /* 헤더 높이만큼 여백 추가 */
+  margin-bottom: 80px; /* 푸터 높이만큼 여백 추가 */
   overflow-y: auto; /* 콘텐츠가 많을 경우 스크롤 활성화 */
 }
 
