@@ -10,7 +10,7 @@
             <div>
                 <label>기존 이미지 :</label>
                 <div v-for="(img, index) in localBoard.boardImg" :key="index" class="existing-img">
-                    <img :src="img.fileName" alt="기존 이미지" style="width: 100px; height: auto; margin-top: 10px;" />
+                    <img :src="img.boardUrl" alt="기존 이미지" style="width: 100px; height: auto; margin-top: 10px;" />
                     <button @click="removeExistingImage(img.imgId)">삭제</button>
                 </div>
             </div>
