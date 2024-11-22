@@ -1,46 +1,55 @@
 <template>
   <div class="board-container">
     <!-- 상단바 -->
-    <div class="board-header">
-      <nav>
-        <RouterLink
-          :to="{ name: 'neighborBoardList' }"
-          :class="{ active: $route.name === 'neighborBoardList' }">
-          동네 게시글
-        </RouterLink>
-        <RouterLink
-          :to="{ name: 'followBoardList' }"
-          :class="{ active: $route.name === 'followBoardList' }">
-          팔로우 게시글
-        </RouterLink>
-      </nav>
-    </div>
+    <template v-if="!isSpecialPage">
+      <div class="board-header">
+          <nav>
+            <RouterLink
+              :to="{ name: 'neighborBoardList' }"
+              :class="{ active: $route.name === 'neighborBoardList' }"
+            >
+              동네 게시글
+            </RouterLink>
+            <RouterLink
+              :to="{ name: 'followBoardList' }"
+              :class="{ active: $route.name === 'followBoardList' }"
+            >
+              팔로우 게시글
+            </RouterLink>
+          </nav>
+        </div>
+    </template>
 
     <!-- 콘텐츠 영역 -->
-    <div class="board-content">
-      <RouterView
-        @updateModalVisibility="updateModalVisibility"
-      />
+    <div class="board-content" :class="{ 'no-padding': isSpecialPage }">
+      <RouterView @updateModalVisibility="updateModalVisibility" />
     </div>
 
     <!-- + 버튼 -->
     <button
-      v-if="!isCommentModalVisible && ($route.name === 'neighborBoardList' || $route.name === 'followBoardList')"
+      v-if="!isCommentModalVisible && !isSpecialPage"
       class="add-post-button"
-      @click="goToCreatePage">
+      @click="goToCreatePage"
+    >
       +
     </button>
   </div>
 </template>
 
 <script setup>
-import { useRouter } from 'vue-router';
-import { ref } from 'vue';
+import { useRouter, useRoute } from 'vue-router';
+import { ref, computed } from 'vue';
 
 const router = useRouter();
+const route = useRoute();
 
 // 댓글 모달 상태
 const isCommentModalVisible = ref(false);
+
+// 특정 페이지 여부 확인
+const isSpecialPage = computed(() =>
+  ['boardCreate', 'boardUpdate'].includes(route.name)
+);
 
 /**
  * 게시글 생성 페이지로 이동
@@ -71,7 +80,6 @@ const updateModalVisibility = (isVisible) => {
 .board-header {
   height: 50px;
   display: flex;
-  justify-content: flex-start;
   align-items: center;
   background-color: #fff;
   border-bottom: 1px solid #ddd;
@@ -104,7 +112,7 @@ const updateModalVisibility = (isVisible) => {
 /* + 버튼 스타일 */
 .add-post-button {
   position: fixed;
-  bottom: 90px;
+  bottom: 110px;
   right: 10px;
   width: 60px;
   height: 60px;
@@ -127,5 +135,9 @@ const updateModalVisibility = (isVisible) => {
   background-color: #e64a19;
   transform: scale(1.1);
   transition: background-color 0.3s ease, transform 0.3s ease;
+}
+
+.no-padding {
+  padding: 0 !important;
 }
 </style>

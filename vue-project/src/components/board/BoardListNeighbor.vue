@@ -33,14 +33,18 @@
         <button @click="confirmDelete(board.boardId)">게시글 삭제</button>
       </div>
 
-      <!-- 러닝 이미지 -->
+      <!-- 게시글 이미지 -->
       <div class="post-image">
-        <img
-          v-for="img in board.boardImg"
-          :key="img.imgId"
-          :src="img.boardUrl"
-          alt="게시글 이미지"
-        />
+        <swiper
+          :modules="[Pagination, Navigation]"
+          :navigation="board.boardImg.length > 1" 
+          :pagination="{ clickable: true }"
+          class="mySwiper"
+        >
+          <swiper-slide v-for="img in board.boardImg" :key="img.imgId">
+            <img :src="img.boardUrl" alt="게시글 이미지" />
+          </swiper-slide>
+        </swiper>
       </div>
 
       <!-- 게시글 내용 -->
@@ -82,6 +86,12 @@ import { ref, reactive, onMounted } from 'vue';
 import { useBoardStore } from '@/stores/board';
 import { useRouter } from 'vue-router';
 import CommentView from './CommentView.vue';
+
+import { Swiper, SwiperSlide } from 'swiper/vue';
+import { Pagination, Navigation } from "swiper";
+import 'swiper/css';
+import 'swiper/css/pagination';
+import 'swiper/css/navigation';
 
 const store = useBoardStore();
 const router = useRouter();
@@ -212,7 +222,7 @@ onMounted(() => {
   border-radius: 10px;
   margin-bottom: 15px;
   padding: 15px;
-  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+  box-shadow: 0 1px 5px rgba(0, 0, 0, 0.2);
   position: relative; /* ... 버튼의 위치 조정을 위해 필요 */
 }
 
@@ -285,9 +295,24 @@ onMounted(() => {
 
 /* 게시글 이미지 */
 .post-image img {
-  width: 100%;
+  width: 360px; 
+  height: 360px;
   border-radius: 10px;
+  object-fit: cover; /* 이미지가 정사각형에 맞게 잘림 */
   margin-top: 10px;
+  display: block; /* 이미지가 블록 요소로 동작 - 공백문제 해결*/
+}
+
+
+/* Swiper 마커 스타일 */
+.mySwiper .swiper-pagination-bullet {
+  background-color: gray;
+  opacity: 0.7;
+}
+
+.mySwiper .swiper-pagination-bullet-active {
+  background-color: #ff5722;
+  opacity: 1;
 }
 
 /* 게시글 내용 */
@@ -347,5 +372,64 @@ onMounted(() => {
   font-size: 0.8rem;
   color: #aaa;
   margin-top: 5px;
+}
+</style>
+
+<style>
+/* Swiper 전체 스타일 */
+.mySwiper {
+  width: 100%;
+  height: 100%;
+}
+
+/* 화살표 스타일 */
+.swiper-button-next,
+.swiper-button-prev {
+  color: #555; /* 회색 화살표 */
+  background: rgba(0, 0, 0, 0); /* 반투명 검은 배경 */
+  border-radius: 50%; /* 동그랗게 만들기 */
+  width: 40px; /* 화살표 크기 조정 */
+  height: 40px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.swiper-button-next {
+  right: 5px;
+}
+
+.swiper-button-prev {
+  left: 5px;
+}
+/* .swiper-button-next:hover,
+.swiper-button-prev:hover {
+  color: #555;
+  background: rgba(0, 0, 0, 0.4);
+} */
+
+/* 화살표 아이콘 크기 */
+.swiper-button-next::after,
+.swiper-button-prev::after {
+  font-size: 16px; /* 아이콘 크기 조정 */
+  font-weight: bold;
+}
+
+/* 마커(Pagination) 스타일 */
+.swiper-pagination-bullet {
+  background: #ccc; /* 기본 연한 회색 */
+  width: 10px; /* 크기 조정 */
+  height: 10px;
+  opacity: 0.6;
+}
+
+.swiper-pagination-bullet-active {
+  background: #888; /* 활성화된 마커는 진한 회색 */
+  opacity: 1;
+}
+
+/* 마커 배치 */
+.swiper-pagination {
+  bottom: 10px; /* 마커 위치 */
 }
 </style>
