@@ -14,6 +14,7 @@
                     :class="{ active: $route.name === 'createChat' }">방 생성</RouterLink>
             </nav>
         </div>
+        <div v-if="$route.name === 'openChatList'" style="height: 0.5em"></div>
         <div class="chat-content">
             <RouterView />
         </div>
