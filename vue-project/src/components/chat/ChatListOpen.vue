@@ -80,14 +80,14 @@
   }
   
   .search-bar {
-    padding-top: 20px;
+    padding-top: 30px;
     position: sticky;
-    top: 5px; /* 스크롤 상단에 고정 */
-    z-index: 10; /* 다른 요소 위에 위치 */
-    background-color: white; /* 배경색을 추가해 시각적으로 분리 */
+    top: 0; /* 스크롤 상단에 고정 */
+    z-index: 100; /* 다른 요소 위에 위치 */
+    background-color: white; /* 완전히 불투명한 배경 */
     padding: 10px;
     box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1); /* 시각적 구분을 위한 그림자 */
-    margin-bottom: 20px;
+    margin-bottom: 10px;
   }
   
   .search-input {

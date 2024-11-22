@@ -51,8 +51,9 @@ export const useChatRoomStore = defineStore('chatRoom', () => {
             headers:getAuthHeaders(),
         })
         .then((res)=>{
+            console.log(res.data)
             if(res)console.log("생성 성공");
-            router.push({name: 'privateChatList'})
+            router.push({name: 'entryRoom', params: { roomId: res.data, roomName:chatRoomCreatDto.roomName}});
         })
         .catch((err)=>{
             console.log(chatRoomCreatDto)

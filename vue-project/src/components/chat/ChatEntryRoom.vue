@@ -33,6 +33,7 @@
               alt="기본 프로필 이미지"
               style="width: 30px; height: 30px; object-fit: cover; border-radius: 20%;"
         />
+        
         <span class="nickname">
           {{ msg.nickname }}
         </span>
@@ -165,7 +166,6 @@ const sendMessage = () => {
 
 // 메시지 수신 처리 함수
 const recvMessage = (receivedMessage) => {
-  console.log(receivedMessage)
   messages.value.push({
     userId: receivedMessage.messageType == 'ENTER' ? '[알림]' : receivedMessage.userId,
     content: receivedMessage.content,
@@ -173,7 +173,7 @@ const recvMessage = (receivedMessage) => {
     userImg: receivedMessage.userImg,
     nickname:receivedMessage.nickname
   });
-
+  console.log("message : " + message.value)
   nextTick(() => scrollToBottom());
 };
 
@@ -341,13 +341,14 @@ onUnmounted(()=>{
   line-height: 30px; /* 이미지 높이에 맞춰 텍스트 가운데 정렬 */
 }
 
-.message-box{
+.message-box {
   background-color: #fee500;
   border-radius: 5px;
   padding: 10px;
-  max-width: 20em;
+  width: fit-content; /* 내용 크기에 따라 자동 조정 */
+  max-width: 18em; /* 너무 넓어지지 않도록 최대 너비 제한 */
+  word-wrap: break-word; /* 텍스트가 길 경우 줄바꿈 처리 */
 }
-
 .my-message {
   align-self: flex-end;
   color: black;
