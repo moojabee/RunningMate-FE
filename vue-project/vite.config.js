@@ -17,4 +17,7 @@ export default defineConfig({
   define: {
     global: 'window', // global 객체 정의
   },
+  optimizeDeps: {
+    include: ['swiper/vue'],
+  },
 })

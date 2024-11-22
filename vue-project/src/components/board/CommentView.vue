@@ -28,7 +28,7 @@
               <div class="comment-header">
                 <div>
                   <span class="nickname">{{ comment.nickname }}</span>
-                  <span class="user-info">{{ comment.userDist }}km · {{ comment.userPace }}</span>
+                  <span class="user-info">{{ comment.userDist }}km  {{ comment.userPace }}</span>
                 </div>
                 <span class="posted-time">{{ formatTimestamp(comment.postedDate) }}</span>
                 <button class="more-button" @click="handleActions(comment)">...</button>
@@ -265,7 +265,7 @@ const closeModal = () => {
   position: absolute;
   top: 0;
   right: 0;
-  margin-top: 0.1em;
+  margin-top: 0.15em;
 }
 
 .comment-text {
