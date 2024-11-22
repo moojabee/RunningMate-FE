@@ -102,11 +102,12 @@
 import { ref, computed, onMounted, watch } from "vue";
 import { useMyPageStore } from "@/stores/myPage";
 import { useRoute, useRouter } from "vue-router";
+import { useChatRoomStore } from "@/stores/chatRoom";
 
 const router = useRouter();
 const route = useRoute();
 const store = useMyPageStore();
-
+const chatStore = useChatRoomStore();
 
 const isMyPage = computed(() => {
   const loggedInUserId = sessionStorage.getItem("userId");
@@ -142,7 +143,11 @@ const followUser = async () => {
 
 // 메세지 전송 페이지 이동
 const sendMessage = () => {
-  
+  chatStore.createChatRoom({
+    roomName: '[개인]',
+    roomType: 'PERSONAL',
+    userList: [store.userInfo.nickname],
+  })
 };
 
 // 데이터 초기 로드
