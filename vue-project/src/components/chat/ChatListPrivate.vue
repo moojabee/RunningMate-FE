@@ -49,12 +49,23 @@
     };
 
     // 시간 포맷팅 메서드 추가
-    const formatTime = (dateString) => {
-        if (!dateString) return ''; // null 체크
-        const date = new Date(dateString);
-        const hours = String(date.getHours()).padStart(2, '0'); // 시 (2자리)
-        const minutes = String(date.getMinutes()).padStart(2, '0'); // 분 (2자리)
-        return `${hours}:${minutes}`; // HH:mm 형식 반환
+    const formatTime = (dateTime) => {
+        if (!dateTime) return '';
+        const now = new Date();
+        const past = new Date(dateTime);
+
+        const diffInSeconds = Math.floor((now - past) / 1000); // 현재 시간과 과거 시간의 차이 (초 단위)
+        const diffInMinutes = Math.floor(diffInSeconds / 60); // 차이를 분 단위로 변환
+        const diffInHours = Math.floor(diffInMinutes / 60); // 차이를 시간 단위로 변환
+        const diffInDays = Math.floor(diffInHours / 24); // 차이를 일 단위로 변환
+
+        if (diffInMinutes < 60) {
+            return `${diffInMinutes}분 전`;
+        } else if (diffInHours < 24) {
+            return `${diffInHours}시간 전`;
+        } else {
+            return `${diffInDays}일 전`;
+        }
     };
 
     import Swal from "sweetalert2"; // SweetAlert2 가져오기
@@ -69,9 +80,7 @@
     });
 
     if (result.isConfirmed) {
-        store.leaveChatRoom({
-        roomId: room.roomId,
-        });
+        store.leaveChatRoom({roomId: room.roomId,});
         Swal.fire({
         title: "나갔습니다!",
         text: `채팅방 '${room.roomName}'에서 나왔습니다.`,
