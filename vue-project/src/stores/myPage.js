@@ -12,6 +12,8 @@ export const useMyPageStore = defineStore('myPage', () => {
   const userInfo = ref([]);
   const isPrivate = ref(false);
   const isFollower = ref(false);
+  const followerList = ref([]);
+  const followingList = ref([]);
 
   const token = ref(sessionStorage.getItem('session'));
 
@@ -201,9 +203,35 @@ export const useMyPageStore = defineStore('myPage', () => {
     }
   };
 
+  const getFollower = async (userId) => {
+    try {
+      const response = await axios.get(`${REST_API_URL}/follower/${userId}`, {
+        headers: getAuthHeaders(),
+      });
+      followerList.value = response.data;
+      console.log("팔로워 리스트 조회 성공:", response.data);
+    } catch (error) {
+      console.error("팔로워 리스트 조회 실패:", error);
+      throw error;
+    }
+  };
+
+  const getFollowing = async (userId) => {
+    try {
+      const response = await axios.get(`${REST_API_URL}/following/${userId}`, {
+        headers: getAuthHeaders(),
+      });
+      followingList.value = response.data;
+      console.log("팔로잉 리스트 조회 성공:", response.data);
+    } catch (error) {
+      console.error("팔로잉 리스트 조회 실패:", error);
+      throw error;
+    }
+  };
+
 
   return { userInfo, myBoardList, getUserInfo, getUserBoard, getUserRun, 
     deleteBoard, updateBoard, toggleLike, userCheck,
     isPrivate, isFollower, checkPrivate, checkFollower,
-    updateUserInfo }
+    updateUserInfo, followerList, followingList, getFollower, getFollowing }
 })
