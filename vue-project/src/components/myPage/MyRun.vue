@@ -1,6 +1,5 @@
 <template>
   <div>
-    <h3>러닝 기록</h3>
     <table>
       <thead>
         <tr>

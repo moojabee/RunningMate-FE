@@ -1,42 +1,102 @@
 <template>
   <div class="my-page">
+    <!-- 사용자 정보 상단 -->
     <div class="user-info">
-      <!-- 프로필 사진 -->
-      <img v-if="store.userInfo.userImg" :src="store.userInfo.userImg" alt="프로필 사진" class="profile-img" />
-      <img v-else src="/src/assets/default-profile.png" alt="기본 프로필 사진" class="profile-img" />
-      
-      <!-- 유저 정보 -->
-      <div class="user-details">
-        <h2>{{ store.userInfo.nickname }}</h2>
-        <p>총 거리: {{ store.userInfo.userDist }}km</p>
-        <p>평균 페이스: {{ store.userInfo.userPace }}</p>
-        <button v-if="isMyPage" @click="goToUpdatePage" class="update-btn">프로필 수정</button>
+      <!-- 프로필 이미지 -->
+      <div class="profile-section">
+        <img
+          v-if="store.userInfo.userImg"
+          :src="store.userInfo.userImg"
+          alt="프로필 사진"
+          class="profile-img"
+        />
+        <img
+          v-else
+          src="/src/assets/default-profile.png"
+          alt="기본 프로필 사진"
+          class="profile-img"
+        />
+        <div class="profile-details">
+          <h2>{{ store.userInfo.nickname }}</h2>
+          <br>
+          <p class="user-region">지역: {{ store.userInfo.address }}</p>
+        </div>
+        <div class="button-container">
+          <!-- 본인 페이지 -->
+          <button
+            v-if="isMyPage"
+            @click="goToUpdatePage"
+            class="update-btn"
+          >
+            프로필 수정
+          </button>
+          <!-- 비공개 계정에 팔로우 버튼 -->
+          <button
+            v-else-if="!isMyPage && isPrivate && !isFollower"
+            @click="followUser"
+            class="follow-btn"
+          >
+            팔로우
+          </button>
+          <!-- 팔로워일 경우 메시지 버튼 -->
+          <button
+            v-else-if="!isMyPage && (isFollower || !isPrivate)"
+            @click="sendMessage"
+            class="message-btn"
+          >
+            메세지
+          </button>
+        </div>
+      </div>
+
+      <!-- 유저 기록 -->
+      <div class="user-stats">
+        <p>총 거리 : {{ store.userInfo.userDist }} km</p>
+        <p>평균 페이스 : {{ store.userInfo.userPace }}</p>
       </div>
     </div>
-    <div>
-      <span>게시글 수: {{ store.userInfo.boardNum }} |</span>
-      <span> 팔로워: {{ store.userInfo.followerNum }} |</span>
-      <span> 팔로잉: {{ store.userInfo.followingNum }}</span>
+
+    <hr class="divider" />
+
+    <!-- 게시글 / 팔로워 / 팔로잉 -->
+    <div class="user-overview">
+      <div>
+        <h4>게시글</h4>
+        <h3>{{ store.userInfo.boardNum }}</h3>
+      </div>
+      <div>
+        <h4>팔로워</h4>
+        <h3>{{ store.userInfo.followerNum }}</h3>
+      </div>
+      <div>
+        <h4>팔로잉</h4>
+        <h3>{{ store.userInfo.followingNum }}</h3>
+      </div>
     </div>
-    <br />
 
-    <!-- 비공개 계정 처리 -->
-    <template v-if="isMyPage || isAuthorized">
-      <!-- 탭 내비게이션 -->
-      <nav class="tab-navigation">
-        <RouterLink :to="{ name: 'myBoard', params: { userId: $route.params.userId } }">게시글</RouterLink>
-        <RouterLink :to="{ name: 'myRun', params: { userId: $route.params.userId } }">러닝 기록</RouterLink>
-      </nav>
+    <hr class="divider" />
 
-      <!-- 탭 콘텐츠 -->
-      <RouterView :key="$route.params.userId" />
-    </template>
-
-    <template v-else>
-      <p>비공개 계정입니다.</p>
-    </template>
+    <!-- 탭 네비게이션 -->
+    <nav class="tab-navigation">
+      <RouterLink
+        v-if="isMyPage || (!isPrivate || isFollower)"
+        class="tab-link"
+        :to="{ name: 'myBoard', params: { userId: $route.params.userId } }"
+      >
+        게시글
+      </RouterLink>
+      <RouterLink
+        v-if="isMyPage || (!isPrivate || isFollower)"
+        class="tab-link"
+        :to="{ name: 'myRun', params: { userId: $route.params.userId } }"
+      >
+        런닝 기록
+      </RouterLink>
+    </nav>
+    <RouterView :key="$route.params.userId" />
   </div>
 </template>
+
 
 <script setup>
 import { ref, computed, onMounted, watch } from "vue";
@@ -47,35 +107,45 @@ const router = useRouter();
 const route = useRoute();
 const store = useMyPageStore();
 
-const isAuthorized = ref(false); 
 
-// 본인 페이지 여부 확인
 const isMyPage = computed(() => {
   const loggedInUserId = sessionStorage.getItem("userId");
   return route.params.userId === loggedInUserId;
 });
+const isPrivate = ref(false); // 비공개 계정 여부
+const isFollower = ref(false); // 팔로워 여부
 
 // 데이터 로드 함수
 const loadData = async (userId) => {
   try {
-    await store.getUserInfo(userId); // store에서 userInfo 가져오기
-    if (isMyPage.value) {
-      isAuthorized.value = true; // 본인 페이지는 항상 접근 가능
-    } else {
-      const isPrivate = await store.checkPrivate(userId);
-      if (!isPrivate) {
-        const isFollower = await store.checkFollower(userId);
-        isAuthorized.value = isFollower; // 팔로워 여부 확인
-      } else {
-        isAuthorized.value = true; // 공개 계정은 접근 허용
+    await store.getUserInfo(userId);
+    if (!isMyPage.value) {
+      isPrivate.value = await store.checkPrivate(userId);
+      if (isPrivate.value) {
+        isFollower.value = await store.checkFollower(userId);
       }
     }
   } catch (error) {
-    console.error("페이지 로드 중 오류:", error);
+    console.error("데이터 로드 실패:", error);
   }
 };
 
-// 초기 데이터 로드
+// 프로필 수정 페이지 이동
+const goToUpdatePage = () => {
+  router.push({ name: "MyPageUpdate", params: { userId: store.userInfo.userId } });
+};
+
+// 팔로우 요청
+const followUser = async () => {
+  
+};
+
+// 메세지 전송 페이지 이동
+const sendMessage = () => {
+  
+};
+
+// 데이터 초기 로드
 onMounted(() => {
   loadData(route.params.userId);
 });
@@ -87,55 +157,139 @@ watch(
     loadData(newUserId);
   }
 );
-
-// 프로필 수정 페이지로 이동
-const goToUpdatePage = () => {
-  router.push({ name: "MyPageUpdate", params: { userId: store.userInfo.userId } });
-};
 </script>
 
 <style scoped>
 .my-page {
   padding: 20px;
+  background-color: #fff;
 }
 
+/* 상단 사용자 정보 */
 .user-info {
   display: flex;
+  flex-direction: column;
   align-items: center;
-  margin-bottom: 20px;
+}
+
+.profile-section {
+  display: flex;
+  align-items: center;
+  width: 100%;
+  justify-content: space-between;
 }
 
 .profile-img {
   width: 100px;
   height: 100px;
-  border-radius: 20%;
+  border-radius: 50%;
   object-fit: cover;
-  margin-right: 20px;
+  margin-right: 10px;
 }
 
-.user-details h2 {
-  margin: 0;
-  font-size: 24px;
+.profile-details {
+  margin-left: 20px;
+  flex-grow: 1;
 }
 
-.user-details p {
+.user-region {
+  font-size: 16px;
+  color: #666;
+}
+
+.update-btn {
+  background-color: #507efd;
+  color: white;
+  padding: 8px 10px;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  font-weight: bold;
+}
+
+.follow-btn {
+  background-color: #e2e2e2;
+  color: rgb(71, 71, 71);
+  padding: 8px 15px;
+  border: 1px solid;
+  border-radius: 5px;
+  cursor: pointer;
+  font-weight: bold;
+}
+
+.message-btn {
+  background-color: #ffd86e;
+  color: rgb(73, 73, 73);
+  padding: 8px 15px;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  font-weight: bold;
+}
+
+/* 버튼 컨테이너 */
+.button-container {
+  position: absolute;
+  right: 20px;
+  top: 2.4rem;
+}
+
+
+.user-stats {
+  display: flex;
+  justify-content: center; /* 중앙 정렬 */
+  align-items: center; /* 세로 정렬 */
+  gap: 40px; /* 요소 간 간격 */
+  margin: 10px; /* 상하 여백 */
+}
+
+.user-stats p {
+  margin-top: 20px;
+  text-align: center;
+  font-size: 16px;
+}
+
+/* 하단 경계선 */
+.divider {
+  border: none;
+  border-top: 2px solid #ddd;
+  margin: 10px 0;
+}
+
+/* 게시글/팔로워/팔로잉 섹션 */
+.user-overview {
+  display: flex;
+  justify-content: space-around;
+  margin: 20px 0;
+}
+
+.user-overview div {
+  text-align: center;
+}
+
+.user-overview p {
   margin: 5px 0;
-  color: #555;
+  font-size: 16px;
+  color: #333;
 }
 
+/* 탭 네비게이션 */
 .tab-navigation {
   display: flex;
-  gap: 20px;
-  margin-bottom: 20px;
+  justify-content: space-around;
+  margin: 5px;
+  margin-bottom: 30px;
+  padding-top: 10px;
 }
 
-.tab-navigation a {
+.tab-link {
   text-decoration: none;
-  color: #007bff;
+  color: #000000;
+  font-size: 19px;
 }
 
-.tab-navigation a.router-link-active {
+.tab-link.router-link-active {
   font-weight: bold;
-  text-decoration: underline;
+  font-size: 20px;
 }
 </style>

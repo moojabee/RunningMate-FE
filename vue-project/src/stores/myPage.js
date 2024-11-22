@@ -26,6 +26,7 @@ export const useMyPageStore = defineStore('myPage', () => {
         headers: getAuthHeaders(),
       });
       userInfo.value = response.data;
+      console.log("유저 정보 조회: ", userInfo)
       return userInfo;
     } catch (error) {
       console.error("유저 정보 조회 실패:", error);
@@ -148,6 +149,7 @@ export const useMyPageStore = defineStore('myPage', () => {
       const response = await axios.get(`${REST_API_URL}/isPrivate/${userId}`, {
         headers: getAuthHeaders(),
       });
+      console.log("계정 공개 여부 : ", response.data)
       isPrivate.value = response.data;
       return response.data;
     } catch (error) {
@@ -162,6 +164,7 @@ export const useMyPageStore = defineStore('myPage', () => {
       const response = await axios.get(`${REST_API_URL}/isFollower/${userId}`, {
         headers: getAuthHeaders(),
       });
+      console.log("팔로워 여부 : ", response.data)
       isFollower.value = response.data;
       return response.data;
     } catch (error) {
