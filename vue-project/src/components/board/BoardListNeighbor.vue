@@ -110,7 +110,6 @@ const openCommentModal = (board) => {
 
 // 댓글 수 업데이트
 const updateCommentCount = ({ boardId, change }) => {
-  console.log("잘 실행되었습니다~?", change, boardId)
   const board = store.neighborBoardList.find((b) => b.boardId === boardId);
   if (board) {
     board.comment.length += change;

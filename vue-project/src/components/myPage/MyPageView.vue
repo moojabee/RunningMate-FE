@@ -64,11 +64,11 @@
         <h4>게시글</h4>
         <h3>{{ store.userInfo.boardNum }}</h3>
       </div>
-      <div>
+      <div @click="openFollowList('follower')">
         <h4>팔로워</h4>
         <h3>{{ store.userInfo.followerNum }}</h3>
       </div>
-      <div>
+      <div @click="openFollowList('following')">
         <h4>팔로잉</h4>
         <h3>{{ store.userInfo.followingNum }}</h3>
       </div>
@@ -76,24 +76,38 @@
 
     <hr class="divider" />
 
-    <!-- 탭 네비게이션 -->
-    <nav class="tab-navigation">
-      <RouterLink
-        v-if="isMyPage || (!isPrivate || isFollower)"
-        class="tab-link"
-        :to="{ name: 'myBoard', params: { userId: $route.params.userId } }"
-      >
-        게시글
-      </RouterLink>
-      <RouterLink
-        v-if="isMyPage || (!isPrivate || isFollower)"
-        class="tab-link"
-        :to="{ name: 'myRun', params: { userId: $route.params.userId } }"
-      >
-        런닝 기록
-      </RouterLink>
-    </nav>
-    <RouterView :key="$route.params.userId" />
+    <div v-if="isMyPage || (!isPrivate || isFollower)">
+      <!-- 탭 네비게이션 -->
+      <nav class="tab-navigation">
+        <RouterLink
+          class="tab-link"
+          :to="{ name: 'myBoard', params: { userId: $route.params.userId } }"
+          >
+          게시글
+        </RouterLink>
+        <RouterLink
+          class="tab-link"
+          :to="{ name: 'myRun', params: { userId: $route.params.userId } }"
+          >
+          런닝 기록
+        </RouterLink>
+      </nav>
+      <hr class="divider" />
+      <div class="content-container">
+        <RouterView :key="$route.params.userId" />
+      </div>
+    </div>
+    <div v-else>
+      <p class="private-account">비공개 계정입니다.</p>
+    </div>
+
+    <!-- FollowList 모달 -->
+    <FollowList
+      v-if="isFollowModalVisible"
+      :type="followType"
+      :followList="followType === 'follower' ? store.followerList : store.followingList"
+      @close="closeFollowList"
+    />
   </div>
 </template>
 
@@ -102,11 +116,14 @@
 import { ref, computed, onMounted, watch } from "vue";
 import { useMyPageStore } from "@/stores/myPage";
 import { useRoute, useRouter } from "vue-router";
+import FollowList from "@/components/myPage/FollowList.vue";
 
 const router = useRouter();
 const route = useRoute();
 const store = useMyPageStore();
 
+const isFollowModalVisible = ref(false); // 팔로워/팔로잉 모달 상태
+const followType = ref(""); // "follower" 또는 "following" 결정
 
 const isMyPage = computed(() => {
   const loggedInUserId = sessionStorage.getItem("userId");
@@ -125,6 +142,8 @@ const loadData = async (userId) => {
         isFollower.value = await store.checkFollower(userId);
       }
     }
+    await store.getFollower(userId);
+    await store.getFollowing(userId);
   } catch (error) {
     console.error("데이터 로드 실패:", error);
   }
@@ -143,6 +162,17 @@ const followUser = async () => {
 // 메세지 전송 페이지 이동
 const sendMessage = () => {
   
+};
+
+// 팔로워/팔로잉 모달 열기
+const openFollowList = (type) => {
+  followType.value = type;
+  isFollowModalVisible.value = true;
+};
+
+// 팔로워/팔로잉 모달 닫기
+const closeFollowList = () => {
+  isFollowModalVisible.value = false;
 };
 
 // 데이터 초기 로드
@@ -182,9 +212,9 @@ watch(
 .profile-img {
   width: 100px;
   height: 100px;
-  border-radius: 50%;
+  border-radius: 15%;
   object-fit: cover;
-  margin-right: 10px;
+  margin: 5px;
 }
 
 .profile-details {
@@ -244,7 +274,7 @@ watch(
 }
 
 .user-stats p {
-  margin-top: 20px;
+  margin-top: 10px;
   text-align: center;
   font-size: 16px;
 }
@@ -277,9 +307,8 @@ watch(
 .tab-navigation {
   display: flex;
   justify-content: space-around;
-  margin: 5px;
-  margin-bottom: 30px;
-  padding-top: 10px;
+  margin: 10px;
+  padding: 10px 0;
 }
 
 .tab-link {
@@ -291,5 +320,17 @@ watch(
 .tab-link.router-link-active {
   font-weight: bold;
   font-size: 20px;
+}
+
+.content-container {
+  height: calc(100vh - 490px); /* 상단 정보를 제외한 높이 설정 */
+  overflow-y: auto; /* 스크롤 가능 */
+  position: relative;
+}
+
+.private-account {
+  text-align: center;
+  color: #666;
+  margin-top: 20px;
 }
 </style>
