@@ -79,6 +79,8 @@ import router from '@/router';
 const route = useRoute();
 const roomId = ref(route.params.roomId);
 const roomName = ref(route.params.roomName)
+const chatRoomInfo = ref();
+
 // Pinia Store 사용
 const chatRoomStore = useChatRoomStore();
 

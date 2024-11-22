@@ -111,7 +111,39 @@ export const useChatRoomStore = defineStore('chatRoom', () => {
         });
     };
 
+    // 채팅방 정보 불러오기
+    const chatRoomInfo = ref()
+    const loadChatRoomInfo = function(roomId){
+        axios.get(`${REST_API_URL}/chatRoomInfo/${roomId}`,{
+            headers: getAuthHeaders(),
+        })
+        .then((res)=>{
+            console.log("chatRoom : " , res.data);
+            chatRoomInfo = res.data;
+        })
+        .catch((err)=>{
+            console.log(err);
+        })
+    }
+
+    // 채팅방 유저 불러오기
+    const userListInChat = ref([])
+    const loadUserListInChat = function(roomId){
+        axios.get(`${REST_API_URL}/userList/${roomId}`,{
+            headers: getAuthHeaders(),
+        })
+        .then((res)=>{
+            console.log(res.data)
+            userListInChat.value =res.data
+        })
+        .catch((err)=>{
+            console.log(err);
+        })
+    }
+
     return {loadChatRoomList,loadOpenChatRoomList,
         createChatRoom,chatRoomList,openChatRoomList,
-        joinChatRoom,leaveChatRoom,loadChatting, chatMessage};
+        joinChatRoom,leaveChatRoom,loadChatting, chatMessage
+        ,userListInChat,loadUserListInChat
+        ,chatRoomInfo,loadChatRoomInfo};
 })
