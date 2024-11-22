@@ -117,6 +117,7 @@ import { ref, computed, onMounted, watch } from "vue";
 import { useMyPageStore } from "@/stores/myPage";
 import { useRoute, useRouter } from "vue-router";
 import FollowList from "@/components/myPage/FollowList.vue";
+import { useChatRoomStore } from "@/stores/chatRoom";
 
 const router = useRouter();
 const route = useRoute();
@@ -124,6 +125,7 @@ const store = useMyPageStore();
 
 const isFollowModalVisible = ref(false); // 팔로워/팔로잉 모달 상태
 const followType = ref(""); // "follower" 또는 "following" 결정
+const chatStore = useChatRoomStore();
 
 const isMyPage = computed(() => {
   const loggedInUserId = sessionStorage.getItem("userId");
@@ -161,7 +163,11 @@ const followUser = async () => {
 
 // 메세지 전송 페이지 이동
 const sendMessage = () => {
-  
+  chatStore.createChatRoom({
+    roomName: '[개인]',
+    roomType: 'PERSONAL',
+    userList: [store.userInfo.nickname],
+  })
 };
 
 // 팔로워/팔로잉 모달 열기
