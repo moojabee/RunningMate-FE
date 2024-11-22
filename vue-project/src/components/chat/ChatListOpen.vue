@@ -16,7 +16,7 @@
         <div class="chat-room-card" @click="confirmAndEnterChatRoom(room.roomName, room.roomId)">
           <div class="chat-room-info">
             <!-- 동그란 채팅방 사진 -->
-            <img src="@/assets/default-profile.png" alt="Room Image" class="chat-room-image" />
+            <img src="@/assets/chat/default-room3.png" alt="Room Image" class="chat-room-image" />
             <span class="chat-room-name">{{ room.roomName }}</span>
           </div>
         </div>
@@ -44,6 +44,12 @@
     );
   });
   
+  // 랜덤 이미지
+  const getRandomRoomImage = () => {
+    const randomNumber = Math.floor(Math.random() * 9) + 1; // 1부터 9까지 랜덤 숫자 생성
+    return require(`@/assets/chat/default-room${randomNumber}.png`);
+  };
+
   // 채팅방 목록 불러오기
   const fetchOpenChatRoomList = () => {
     store.loadOpenChatRoomList();
