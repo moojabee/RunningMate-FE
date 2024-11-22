@@ -21,8 +21,8 @@
   
         <!-- MyPage 버튼 -->
         <RouterLink 
-          :to="{ name: 'myPage', params: { userId: userAuthStore.userId } }" 
-          :key="userAuthStore.userId" 
+          :to="{ name: 'myPage', params: { userId: userId } }" 
+          :key="userId" 
           class="icon-link"
         >
           <img src="@/assets/menu/Profile.png" alt="My Page"
@@ -33,8 +33,7 @@
   </template>
   
   <script setup>
-  import { useUserAuthStore } from "@/stores/userAuth";
-  const userAuthStore = useUserAuthStore();
+    const userId = sessionStorage.getItem('userId');
   </script>
   
   <style scoped>

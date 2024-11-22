@@ -16,7 +16,9 @@
           class="profile-img"
         />
         <div class="user-info">
-          <h4>{{ board.nickname }}</h4>
+          <RouterLink :to="{ name: 'myPage', params: { userId: board.userId } }">
+            <h4>{{ board.nickname }}</h4>
+          </RouterLink>
           <p>{{ board.userDist }}km {{ board.userPace }}</p>
         </div>
         <!-- ... 버튼: 본인이 작성한 게시글만 보이도록 설정 -->
@@ -108,9 +110,10 @@ const openCommentModal = (board) => {
 
 // 댓글 수 업데이트
 const updateCommentCount = ({ boardId, change }) => {
+  console.log("잘 실행되었습니다~?", change, boardId)
   const board = store.neighborBoardList.find((b) => b.boardId === boardId);
   if (board) {
-    board.commentCount += change;
+    board.comment.length += change;
   }
 };
 
@@ -252,6 +255,10 @@ onMounted(() => {
   margin: 5px 0 0;
   font-size: 0.9rem;
   color: #888;
+}
+
+.user-info a {
+  text-decoration: none;
 }
 
 .more-button {
