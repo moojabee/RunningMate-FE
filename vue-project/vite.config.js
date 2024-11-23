@@ -29,7 +29,7 @@ export default defineConfig({
   },
   server: {
     proxy: {
-      '/': {
+      '/api': {
         target: 'https://www.runningmate.shop:', // 백엔드 서버 URL
         changeOrigin: true,
         rewrite: (path) => path.replace(/^\/api/, ''), // /api 제거
