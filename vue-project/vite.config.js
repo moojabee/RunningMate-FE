@@ -29,8 +29,8 @@ export default defineConfig({
   },
   server: {
     proxy: {
-      '/api': {
-        target: 'https://www.runningmate.shop', // 백엔드 서버 URL
+      '/': {
+        target: 'https://www.runningmate.shop:80', // 백엔드 서버 URL
         changeOrigin: true,
         rewrite: (path) => path.replace(/^\/api/, ''), // /api 제거
         secure: true, // HTTPS 요청 허용
