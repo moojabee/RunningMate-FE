@@ -12,7 +12,7 @@ export default defineConfig({
       '@': fileURLToPath(new URL('./src', import.meta.url)), // @ 경로 설정
     },
   },
-  base: './', // Netlify 배포 시 상대 경로로 처리
+  base: '', // Netlify 배포 시 상대 경로로 처리
   define: {
     global: 'window', // global 객체 정의
   },
@@ -26,5 +26,8 @@ export default defineConfig({
         assetFileNames: '[name][extname]', // 정적 파일 이름 규칙
       },
     },
+  },
+  devServer: {
+    proxy : 'https://www.runningmate.shop:80'
   },
 });
