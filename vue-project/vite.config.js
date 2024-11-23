@@ -20,7 +20,7 @@ export default defineConfig({
     include: ['swiper/vue'], // Swiper를 명시적으로 포함
   },
   build: {
-    outDir: 'vue-project/dist', // 빌드 결과물 디렉터리 설정
+    outDir: 'dist', // 빌드 결과물 디렉터리 설정
     rollupOptions: {
       output: {
         assetFileNames: '[name][extname]', // 정적 파일 이름 규칙
