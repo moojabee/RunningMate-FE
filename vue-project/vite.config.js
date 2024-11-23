@@ -27,7 +27,7 @@ export default defineConfig({
       },
     },
   },
-  server: {
+  devServer: {
     proxy: {
       '/': {
         target:  'http://52.79.153.144:8080', // 백엔드 서버 URL
