@@ -33,7 +33,7 @@ export default defineConfig({
         target: 'https://www.runningmate.shop:80', // 백엔드 서버 URL
         changeOrigin: true,
         rewrite: (path) => path.replace(/^\/api/, ''), // /api 제거
-        secure: true, // HTTPS 요청 허용
+        secure: false, // HTTPS 요청 허용
       },
     },
   },
