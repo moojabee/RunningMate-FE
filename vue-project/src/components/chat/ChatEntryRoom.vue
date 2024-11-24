@@ -108,7 +108,7 @@ const goBack = () => {
 
 // STOMP 연결 함수
 const connect = () => {
-  const socket = new SockJS('http://localhost:8080/ws-stomp');
+  const socket = new SockJS(`${REST_API_URL}/ws-stomp`);
   stompClient.value = Stomp.over(socket);
   stompClient.value.connect(
     {},
