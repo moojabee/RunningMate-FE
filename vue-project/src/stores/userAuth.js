@@ -27,7 +27,7 @@ export const useUserAuthStore = defineStore('userAuth', () => {
         showLoading('로그인 중...', '잠시만 기다려 주세요.');
         console.log(email , password);
         axios
-          .post(`/userAuth/login`, {
+          .post(`${REST_API_URL}/userAuth/login`, {
             email: email,
             password: password,
           })
