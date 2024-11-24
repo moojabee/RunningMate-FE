@@ -121,7 +121,7 @@ const updateCommentCount = ({ boardId, change }) => {
 const goToUpdatePage = (board) => {
   router.push({
     name: 'myBoardUpdate',
-    params: { id: board.boardId },
+    params: { boardId: board.boardId },
     props: { boardData: board }
   });
 };

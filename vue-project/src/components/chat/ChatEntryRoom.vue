@@ -80,6 +80,7 @@ const route = useRoute();
 const roomId = ref(route.params.roomId);
 const roomName = ref(route.params.roomName)
 const chatRoomInfo = ref();
+const REST_API_URL=import.meta.env.VITE_REST_API_URL;
 
 // Pinia Store 사용
 const chatRoomStore = useChatRoomStore();
@@ -108,7 +109,7 @@ const goBack = () => {
 
 // STOMP 연결 함수
 const connect = () => {
-  const socket = new SockJS('http://localhost:8080/ws-stomp');
+  const socket = new SockJS(`${REST_API_URL}/ws-stomp`);
   stompClient.value = Stomp.over(socket);
   stompClient.value.connect(
     {},

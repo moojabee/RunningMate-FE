@@ -119,7 +119,7 @@ export const useChatRoomStore = defineStore('chatRoom', () => {
         })
         .then((res)=>{
             console.log("chatRoom : " , res.data);
-            chatRoomInfo = res.data;
+            chatRoomInfo.value = res.data;
         })
         .catch((err)=>{
             console.log(err);

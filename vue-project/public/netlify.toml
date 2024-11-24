@@ -1,0 +1,14 @@
+# 기본 설정
+[build]
+  command = "npm run build" # 빌드 명령어
+  publish = "dist"          # 빌드 결과물 디렉토리
+
+# 리다이렉트 설정
+[[redirects]]
+  from = "/*"
+  to = "/index.html"
+  status = 200
+
+# 환경변수 설정
+[build.environment]
+  VITE_REST_API_URL = "https://www.runningmate.shop" # 환경변수 설정

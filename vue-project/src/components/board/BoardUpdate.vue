@@ -53,7 +53,7 @@ const files = ref([]); // 새로 추가한 이미지 파일 리스트
 const deleteImgIds = ref([]); // 삭제할 이미지 ID 리스트
 
 // 게시글 ID를 라우터 파라미터로부터 가져오기
-const boardId = route.params.id;
+const boardId = route.params.boardId;
 
 // 기존 게시글 데이터를 불러와 content와 이미지 설정
 onMounted(() => {
