@@ -5,7 +5,7 @@ import router from '@/router'
 
 axios.defaults.withCredentials = true;
 
-const REST_API_URL=import.meta.env.VITE_REST_API_URL
+const REST_API_URL=import.meta.env.VITE_REST_API_URL/board
 
 export const useBoardStore = defineStore('board', () => {
   const followBoardList = ref([])
