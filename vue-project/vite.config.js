@@ -30,10 +30,10 @@ export default defineConfig({
   server: {
     proxy: {
       '/': {
-        target: 'www.runningmate.shop',  // Spring Boot 서버의 실제 IP로 변경
+        target: 'https://www.runningmate.shop',  // Spring Boot 서버의 실제 IP로 변경 (https:// 추가)
         changeOrigin: true,
         rewrite: (path) => path.replace(/^\/api/, ''),  // /api 제거
-        secure: false,  // secure를 false로 설정 (HTTP 요청이므로)
+        secure: true,  // secure를 true로 설정 (https 요청이므로)
       },
     },
   }
