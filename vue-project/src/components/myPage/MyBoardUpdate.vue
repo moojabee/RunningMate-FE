@@ -122,12 +122,12 @@ const updateBoard = () => {
         .map(fileData => fileData.file);
 
     store.updateBoard(localBoard.value, selectedFiles, localBoard.value.boardId, deleteImgIds.value);
-    router.push({ name: 'myPage' });
+    router.push({ name: 'myPage', params: { userId: localBoard.value.userId } });
 };
 
 // 수정 취소
 const cancelUpdate = () => {
-    router.push({ name: 'myPage' });
+    router.push({ name: 'myPage', params: { userId: localBoard.value.userId } });
 };
 </script>
 

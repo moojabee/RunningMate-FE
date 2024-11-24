@@ -14,7 +14,7 @@
         </RouterLink>
   
         <!-- Run 버튼 -->
-        <RouterLink :to="{ name: 'board' }" class="icon-link">
+        <RouterLink :to="{ name: 'run' }" class="icon-link">
           <img src="@/assets/menu/Run.png" alt="Run"
           style="width: 35px; height: 35px; object-fit: cover"  />
         </RouterLink>

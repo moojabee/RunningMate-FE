@@ -120,7 +120,7 @@ const updateCommentCount = ({ boardId, change }) => {
 const goToUpdatePage = (board) => {
   router.push({
     name: 'boardUpdate',
-    params: { id: board.boardId },
+    params: { boardId: board.boardId },
     props: { boardData: board }
   });
 };
@@ -208,6 +208,7 @@ const formatTimestamp = (postedDate) => {
 // 페이지 마운트 시 게시글 목록 가져오기
 onMounted(() => {
   store.getNeighborBoardList();
+  store.getFollowBoardList();
 });
 </script>
 

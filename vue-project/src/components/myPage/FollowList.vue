@@ -6,28 +6,30 @@
         <button class="close-button" @click="$emit('close')">✕</button>
       </div>
       <div class="modal-content">
-        <ul>
-          <!-- status가 0인 유저 리스트 -->
+        <ul v-if="isMyPage">
           <li v-for="user in followList.filter(user => user.status === 0)" :key="user.userId">
             <img :src="user.userImg || '/src/assets/default-profile.png'" alt="유저 이미지" />
             <div class="user-info">
               <p>{{ user.nickname }}</p>
               <p>{{ user.userDist }}km {{ user.userPace }}</p>
             </div>
-            <button @click="handleAction(user)">삭제</button>
+            <div>
+              <button v-if="type === 'follower'" @click="updateFollowStatus(user)">확인 </button>
+              <button @click="deleteFollow(user)"> 취소</button>
+            </div>
           </li>
         </ul>
-        <!-- status가 0인 유저가 있을 때만 hr 보이기 -->
-        <hr v-if="followList.some(user => user.status === 0)" class="divider"/>
+        <hr v-if="isMyPage && followList.some(user => user.status === 0)" class="divider" />
         <ul>
-          <!-- status가 1인 유저 리스트 -->
           <li v-for="user in followList.filter(user => user.status === 1)" :key="user.userId">
             <img :src="user.userImg || '/src/assets/default-profile.png'" alt="유저 이미지" />
             <div class="user-info">
               <p>{{ user.nickname }}</p>
               <p>{{ user.userDist }}km {{ user.userPace }}</p>
             </div>
-            <button @click="handleAction(user)">삭제</button>
+            <div v-if="isMyPage">
+              <button @click="deleteFollow(user)">삭제</button>
+            </div>
           </li>
         </ul>
       </div>
@@ -36,14 +38,58 @@
 </template>
 
 <script setup>
+import { computed } from "vue";
+import { useRoute } from "vue-router";
+import { useMyPageStore } from "@/stores/myPage";
+
 const props = defineProps({
   type: { type: String, required: true }, // "follower" 또는 "following"
   followList: { type: Array, required: true }, // 팔로워/팔로잉 리스트
 });
 
+const route = useRoute();
+const store = useMyPageStore();
 
-const handleAction = (user) => {
-  console.log(`${props.type} 리스트에서`, user.nickname, "작업 실행");
+// 본인의 마이페이지인지 확인
+const isMyPage = computed(() => {
+  const loggedInUserId = sessionStorage.getItem("userId");
+  return route.params.userId === loggedInUserId;
+});
+
+// 팔로우 상태 업데이트
+const updateFollowStatus = async (user) => {
+  try {
+    await store.updateFollowStatus(user.userId); // 상태 업데이트
+    console.log("팔로우 상태 업데이트 성공:", user.nickname);
+    await refreshLists();
+  } catch (error) {
+    console.error("팔로우 상태 업데이트 실패:", error);
+  }
+};
+
+// 팔로우 삭제
+const deleteFollow = async (user) => {
+  try {
+    if (props.type === "follower") {
+      await store.deleteFollower(user.userId); // 팔로워 삭제
+      console.log("팔로워 삭제 성공:", user.nickname);
+    } else if (props.type === "following") {
+      await store.deleteFollowing(user.userId); // 팔로잉 삭제
+      console.log("팔로잉 삭제 성공:", user.nickname);
+    }
+    await refreshLists();
+  } catch (error) {
+    console.error("팔로우 삭제 실패:", error);
+  }
+};
+
+// 팔로워/팔로잉 리스트 및 카운트 갱신
+const refreshLists = async () => {
+  await Promise.all([
+    store.getFollower(route.params.userId),
+    store.getFollowing(route.params.userId),
+    store.getUserInfo(route.params.userId), // 팔로워/팔로잉 숫자 갱신
+  ]);
 };
 </script>
 
