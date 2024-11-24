@@ -28,6 +28,7 @@ export default defineConfig({
     },
   },
   server: {
+    
     proxy: {
       '/': {
         target: 'https://www.runningmate.shop',  // Spring Boot 서버의 실제 IP로 변경 (https:// 추가)
