@@ -80,6 +80,7 @@ const route = useRoute();
 const roomId = ref(route.params.roomId);
 const roomName = ref(route.params.roomName)
 const chatRoomInfo = ref();
+const REST_API_URL=import.meta.env.VITE_REST_API_URL;
 
 // Pinia Store 사용
 const chatRoomStore = useChatRoomStore();
