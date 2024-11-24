@@ -5,7 +5,7 @@ import router from '@/router'
 
 axios.defaults.withCredentials = true;
 
-const REST_API_URL = `http://localhost:8080/myPage`
+const REST_API_URL=import.meta.env.VITE_REST_API_URL
 
 export const useMyPageStore = defineStore('myPage', () => {
   const myBoardList = ref([]);
