@@ -30,7 +30,7 @@ export default defineConfig({
   server: {
     proxy: {
       '/': {
-        target: 'http://52.79.153.144:8080',  // Spring Boot 서버의 실제 IP로 변경
+        target: 'http://52.79.153.144',  // Spring Boot 서버의 실제 IP로 변경
         changeOrigin: true,
         rewrite: (path) => path.replace(/^\/api/, ''),  // /api 제거
         secure: false,  // secure를 false로 설정 (HTTP 요청이므로)

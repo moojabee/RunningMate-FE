@@ -11,4 +11,4 @@
 
 # 환경변수 설정
 [build.environment]
-  VITE_REST_API_URL = "https://www.runningmate.shop" # 환경변수 설정
+  VITE_REST_API_URL=https://52.79.153.144
