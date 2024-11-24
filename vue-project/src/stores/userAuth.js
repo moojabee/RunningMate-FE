@@ -36,6 +36,7 @@ export const useUserAuthStore = defineStore('userAuth', () => {
             console.log(res.data)
             user.value = res.data;
             token.value = res.headers['Authorization'];
+            console.log(token.value);
             sessionStorage.setItem('userId', user.value.userId);
             userId.value = user.value.userId;
             sessionStorage.setItem('userNickname',user.value.nickname)
