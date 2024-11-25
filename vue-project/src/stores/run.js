@@ -78,8 +78,29 @@ export const useRunStore = defineStore("run", () => {
       // 자이로센서 및 가속도계 코드
       if (window.DeviceMotionEvent) {
         let lastTimestamp = null;
-        let velocityX = 0;
-        let velocityY = 0;
+        let velocityX = 0,
+          velocityY = 0,
+          velocityZ = 0;
+  
+        // 칼만 필터 초기화
+        const kalmanFilter = {
+          Q: 0.01, // 프로세스 노이즈
+          R: 0.1,  // 측정 노이즈
+          x: 0,    // 상태 변수
+          P: 1,    // 오차 공분산
+          K: 0,    // 칼만 이득
+          update(measurement) {
+            // 예측 단계
+            this.P += this.Q;
+  
+            // 업데이트 단계
+            this.K = this.P / (this.P + this.R);
+            this.x += this.K * (measurement - this.x);
+            this.P *= 1 - this.K;
+  
+            return this.x;
+          },
+        };
   
         window.addEventListener("devicemotion", (event) => {
           if (!lastTimestamp) {
@@ -91,17 +112,23 @@ export const useRunStore = defineStore("run", () => {
           const dt = (event.timeStamp - lastTimestamp) / 1000; // 초 단위
           lastTimestamp = event.timeStamp;
   
-          // 가속도 데이터 가져오기
-          const accelerationX = event.acceleration.x || 0;
-          const accelerationY = event.acceleration.y || 0;
+          // 가속도 데이터 가져오기 및 칼만 필터 적용
+          const accelerationX = kalmanFilter.update(event.acceleration.x || 0);
+          const accelerationY = kalmanFilter.update(event.acceleration.y || 0);
+          const accelerationZ = kalmanFilter.update(event.acceleration.z || 0);
   
           // 속도 업데이트 (v = u + at)
           velocityX += accelerationX * dt;
           velocityY += accelerationY * dt;
+          velocityZ += accelerationZ * dt;
   
           // 거리 계산 (s = ut + 0.5at^2)
           const deltaX = velocityX * dt + 0.5 * accelerationX * dt * dt; // x축 이동 거리 (m)
           const deltaY = velocityY * dt + 0.5 * accelerationY * dt * dt; // y축 이동 거리 (m)
+          const deltaZ = velocityZ * dt + 0.5 * accelerationZ * dt * dt; // z축 이동 거리 (m)
+  
+          // 총 이동 거리 (3D 거리 계산)
+          const totalDistance = Math.sqrt(deltaX ** 2 + deltaY ** 2 + deltaZ ** 2) / 1000; // km 단위
   
           // 위도/경도 변환
           const deltaLatitude = deltaY / 111000; // 위도의 변화량
@@ -114,15 +141,15 @@ export const useRunStore = defineStore("run", () => {
           // 코스에 추가
           course.value.push({ latitude: latitude.value, longitude: longitude.value });
   
-          // 이동 거리 갱신 (m → km 변환)
-          const distance = Math.sqrt(deltaX ** 2 + deltaY ** 2) / 1000; // 이동 거리 (km 단위)
-          runResult.value.distance += distance; // 누적 거리
+          // 이동 거리 갱신
+          runResult.value.distance += totalDistance; // 누적 거리 (km 단위)
         });
       } else {
         console.error("DeviceMotionEvent를 지원하지 않는 브라우저입니다.");
       }
     }
   };
+  
 
   /**추가 사항 */
   // const getCurrentLocation = function () {
