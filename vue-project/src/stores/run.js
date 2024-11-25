@@ -86,7 +86,7 @@ export const useRunStore = defineStore("run", () => {
         const decelerationFactor = 0.9;
   
         // 가속도 증가 계수 설정 (보수적으로 증가)
-        const accelerationFactor = 0.2;
+        const accelerationFactor = 0.1;
   
         // 칼만 필터 초기화
         const kalmanFilter = {
