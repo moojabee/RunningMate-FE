@@ -82,8 +82,11 @@ export const useRunStore = defineStore("run", () => {
           velocityY = 0,
           velocityZ = 0;
   
-        // 감속 계수 설정 (0~1, 낮을수록 빠르게 감속)
-        const decelerationFactor = 0.98;
+        // 감속 계수 설정 (빠르게 속도를 줄임)
+        const decelerationFactor = 0.9;
+  
+        // 가속도 증가 계수 설정 (보수적으로 증가)
+        const accelerationFactor = 0.2;
   
         // 칼만 필터 초기화
         const kalmanFilter = {
@@ -116,16 +119,21 @@ export const useRunStore = defineStore("run", () => {
           lastTimestamp = event.timeStamp;
   
           // 가속도 데이터 가져오기 및 칼만 필터 적용
-          const accelerationX = kalmanFilter.update(event.acceleration.x || 0);
-          const accelerationY = kalmanFilter.update(event.acceleration.y || 0);
-          const accelerationZ = kalmanFilter.update(event.acceleration.z || 0);
+          let accelerationX = kalmanFilter.update(event.acceleration.x || 0);
+          let accelerationY = kalmanFilter.update(event.acceleration.y || 0);
+          let accelerationZ = kalmanFilter.update(event.acceleration.z || 0);
+  
+          // 가속도 보수적으로 증가
+          accelerationX = accelerationX * (1 - accelerationFactor) + event.acceleration.x * accelerationFactor;
+          accelerationY = accelerationY * (1 - accelerationFactor) + event.acceleration.y * accelerationFactor;
+          accelerationZ = accelerationZ * (1 - accelerationFactor) + event.acceleration.z * accelerationFactor;
   
           // 속도 업데이트 (v = u + at)
           velocityX += accelerationX * dt;
           velocityY += accelerationY * dt;
           velocityZ += accelerationZ * dt;
   
-          // 감속 적용
+          // 감속 적용 (빠르게 감소)
           velocityX *= decelerationFactor;
           velocityY *= decelerationFactor;
           velocityZ *= decelerationFactor;
@@ -157,6 +165,7 @@ export const useRunStore = defineStore("run", () => {
       }
     }
   };
+  
   
 
   /**추가 사항 */
