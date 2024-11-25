@@ -20,6 +20,7 @@ export const useChatRoomStore = defineStore('chatRoom', () => {
         })
         .then((res)=>{
             chatRoomList.value = res.data
+            console.log("나의 채팅방 : ",chatRoomList.value)
         })  
         .catch((error)=>{
             console.log("채팅방 목록 조회 실패",error)
