@@ -181,7 +181,7 @@ const followUser = async () => {
 // 메세지 전송 페이지 이동
 const sendMessage = () => {
   chatStore.createChatRoom({
-    roomName: '[개인]',
+    roomName: `[개인] ${store.userInfo.nickname}`,
     roomType: 'PERSONAL',
     userList: [store.userInfo.nickname],
   })

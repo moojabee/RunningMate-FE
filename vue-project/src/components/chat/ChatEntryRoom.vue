@@ -6,10 +6,19 @@
         <img src="@/assets/chat/back.png" alt="뒤로" class="back-icon" />
       </button>
       <h2 class="room-title">{{ roomName }}</h2>
-      <button class="menu-button" @click="goBack">
-        <img src="@/assets/chat/menu.png" alt="뒤로" class="menu-icon" />
+      <button class="menu-button" @click="toggleModal">
+        <img src="@/assets/chat/menu.png" alt="메뉴" class="menu-icon" />
       </button>
     </header>
+
+    <!-- 모달 -->
+    <div v-bind:class="{'modal': true, 'open': isModalOpen}">
+      <div class="modal-content">
+        <!-- 모달 내용 -->
+        <h3>메뉴</h3>
+        <p>여기에 메뉴 항목을 추가하세요.</p>
+      </div>
+    </div>
 
     <!-- 채팅 리스트 -->
     <ul class="chat-list" ref="messageList">
@@ -101,6 +110,13 @@ const formatTime = (dateTime) => {
   const minutes = String(date.getMinutes()).padStart(2, '0');
   const seconds = String(date.getSeconds()).padStart(2, '0');
   return `${hours}:${minutes}`;
+};
+
+const isModalOpen = ref(false);
+
+// 모달 열기/닫기 함수
+const toggleModal = () => {
+  isModalOpen.value = !isModalOpen.value;
 };
 
 const goBack = () => {
@@ -377,5 +393,30 @@ onUnmounted(()=>{
   right: -35px; /* 상대 메시지 시간은 오른쪽 */
 }
 
+/* 모달 스타일 */
+.modal {
+  position: fixed;
+  top: 11%; /* menu 바 기준으로 상단 위치 */
+  right: 0;
+  width: 50%; /* 오른쪽 반만 차지 */
+  height: calc(100vh - 3em - 60px); /* 화면 높이에서 메뉴바와 푸터 높이만큼 빼고 채움 */
+  background-color: rgba(0, 0, 0, 0.5); /* 어두운 배경 */
+  display: none;
+  z-index: 1000;
+  transition: transform 0.3s ease;
+  transform: translateX(100%); /* 오른쪽 바깥에 위치 */
+}
+
+.modal.open {
+  display: block;
+  transform: translateX(0); /* 모달이 오른쪽에서 열림 */
+}
+
+.modal-content {
+  background-color: white;
+  height: 100%;
+  overflow-y: auto;
+  padding: 20px;
+}
 
 </style>
