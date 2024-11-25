@@ -61,7 +61,7 @@ export const useRunStore = defineStore("run", () => {
   };
   
   const getCurrentLocation = function () {
-    if (longitude.value === 0 && navigator.geolocation) {
+    if (longitude.value == 0 && navigator.geolocation) {
       navigator.geolocation.getCurrentPosition(
         (position) => {
           latitude.value = position.coords.latitude;
@@ -81,6 +81,9 @@ export const useRunStore = defineStore("run", () => {
         let velocityX = 0,
           velocityY = 0,
           velocityZ = 0;
+  
+        // 감속 계수 설정 (0~1, 낮을수록 빠르게 감속)
+        const decelerationFactor = 0.98;
   
         // 칼만 필터 초기화
         const kalmanFilter = {
@@ -121,6 +124,11 @@ export const useRunStore = defineStore("run", () => {
           velocityX += accelerationX * dt;
           velocityY += accelerationY * dt;
           velocityZ += accelerationZ * dt;
+  
+          // 감속 적용
+          velocityX *= decelerationFactor;
+          velocityY *= decelerationFactor;
+          velocityZ *= decelerationFactor;
   
           // 거리 계산 (s = ut + 0.5at^2)
           const deltaX = velocityX * dt + 0.5 * accelerationX * dt * dt; // x축 이동 거리 (m)
