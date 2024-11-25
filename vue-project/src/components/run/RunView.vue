@@ -135,7 +135,7 @@ const startCountdown = () => {
     opacity: 0.9;
   }
   100% {
-    transform: scale(1.5);
+    transform: scale(1.3);
     opacity: 1;
   }
 }
