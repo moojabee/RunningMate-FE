@@ -134,8 +134,9 @@ export const useChatRoomStore = defineStore('chatRoom', () => {
             headers: getAuthHeaders(),
         })
         .then((res)=>{
-            console.log(res.data)
             userListInChat.value =res.data
+            console.log("여기 : ",userListInChat.value)
+            return res.data
         })
         .catch((err)=>{
             console.log(err);
