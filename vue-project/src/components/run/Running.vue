@@ -84,6 +84,7 @@ const startTimer = () => {
       const minutes = Math.floor(elapsed / 60).toString().padStart(2, "0");
       const seconds = (elapsed % 60).toString().padStart(2, "0");
       elapsedTime.value = `${minutes}:${seconds}`;
+      calculatePace(elapsed); // pace 계산
     } else {
       elapsedTime.value = "00:00";
     }
@@ -101,11 +102,24 @@ const startLocationTracking = () => {
       store.getCurrentLocation();
       distance.value = store.runResult.distance;
     }
+    console.log("distance : ", distance);
   };
 
   if (locationIntervalId.value) clearInterval(locationIntervalId.value);
   locationIntervalId.value = setInterval(updateLocation, 5000);
   updateLocation(); // 즉시 첫 업데이트 실행
+};
+
+// 페이스 계산
+const calculatePace = (elapsed) => {
+  if (distance.value > 0) {
+    const paceMinutes = Math.floor((elapsed / 60) / distance.value);
+    const paceSeconds = Math.floor((elapsed % 60) / distance.value);
+    pace.value = `${paceMinutes}'${paceSeconds.toString().padStart(2, "0")}"`;
+    console.log("pace : " , pace)
+  } else {
+    pace.value = "0'00\"";
+  }
 };
 
 // 일시정지
@@ -138,9 +152,6 @@ onUnmounted(() => {
   clearIntervals();
 });
 </script>
-
-
-
 
 
 

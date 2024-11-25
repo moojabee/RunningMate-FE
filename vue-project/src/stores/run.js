@@ -6,6 +6,11 @@ import Swal from "sweetalert2";
 const REST_API_URL = import.meta.env.VITE_REST_API_URL;
 
 export const useRunStore = defineStore("run", () => {
+  const token = ref(sessionStorage.getItem('session'));
+  const getAuthHeaders = () => ({
+    Authorization: token.value
+  });
+
   const course = ref([]);
   const runResult = ref({
     runImg: "",
@@ -70,7 +75,7 @@ export const useRunStore = defineStore("run", () => {
 
   const addDistance = function () {
     const size = course.value.length;
-    if (size < 2) return;
+    if (size < 2 || isPaused.value) return; // 일시정지 상태에서 거리 계산 방지
 
     const diffLat = course.value[size - 2].latitude - course.value[size - 1].latitude;
     const diffLon = course.value[size - 2].longitude - course.value[size - 1].longitude;
@@ -81,12 +86,23 @@ export const useRunStore = defineStore("run", () => {
 
   const resultSend = function () {
     Swal.fire("잠시만 기다려 주세요...", "결과를 전송 중입니다.", "info");
+  
+    const formattedRunResult = {
+      ...runResult.value,
+      startTime: formatToLocalDateTime(runResult.value.startTime),
+      endTime: formatToLocalDateTime(runResult.value.endTime),
+    };
+  
+    console.log("Formatted Run Result: ", formattedRunResult); // 디버깅 로그 추가
+  
     axios({
       url: `${REST_API_URL}/run/record`,
       method: "POST",
-      data: runResult.value,
+      data: formattedRunResult,
+      headers: getAuthHeaders(),
     })
       .then(() => {
+        console.log("결과 전송 성공!");
         Swal.fire({
           icon: "success",
           title: "완료",
@@ -95,7 +111,8 @@ export const useRunStore = defineStore("run", () => {
           window.location.href = "/runningResult";
         });
       })
-      .catch(() => {
+      .catch((error) => {
+        console.error("결과 전송 실패: ", error.response?.data || error.message);
         Swal.fire({
           icon: "error",
           title: "오류",
@@ -103,9 +120,22 @@ export const useRunStore = defineStore("run", () => {
         });
       });
   };
+  
+  
+  const formatToLocalDateTime = (isoTime) => {
+    if (!isoTime) return null;
+    const date = new Date(isoTime);
+    const yyyy = date.getFullYear();
+    const MM = (date.getMonth() + 1).toString().padStart(2, "0");
+    const dd = date.getDate().toString().padStart(2, "0");
+    const hh = date.getHours().toString().padStart(2, "0");
+    const mm = date.getMinutes().toString().padStart(2, "0");
+    const ss = date.getSeconds().toString().padStart(2, "0");
+    return `${yyyy}-${MM}-${dd}T${hh}:${mm}:${ss}`;
+  };
 
   return {
     course, runResult, pausedDuration, lastPauseTime, isPaused,
-    init, start, end, pause, resume, getCurrentLocation, resultSend,
+    init,  start, end, pause, resume, getCurrentLocation, resultSend,
   };
 });
