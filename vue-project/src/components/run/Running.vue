@@ -3,18 +3,18 @@
     <!-- 상단 영역 -->
     <div class="header">
       <div class="pace">
-        <p class="value">7'15"</p>
+        <p class="value">{{ pace }}</p>
         <p class="label">페이스</p>
       </div>
       <div class="time">
-        <p class="value">08:20</p>
+        <p class="value">{{ elapsedTime }}</p>
         <p class="label">시간</p>
       </div>
     </div>
 
     <!-- 거리 정보 -->
     <div class="distance">
-      <p class="value">1.14</p>
+      <p class="value">{{ distance.toFixed(2) }}</p>
       <p class="label">킬로미터</p>
     </div>
 
@@ -39,30 +39,110 @@
 </template>
 
 <script setup>
-import { ref } from "vue";
-import { useRouter } from "vue-router";
+import { ref, computed, onMounted, onUnmounted } from "vue";
+import { useRunStore } from "@/stores/run";
 
-const router = useRouter();
-const isPaused = ref(false); // 현재 일시정지 상태인지 여부
+// Store 가져오기
+const store = useRunStore();
 
-// 일시정지 로직
-const pauseRunning = () => {
-  isPaused.value = true;
-  console.log("기록 측정이 일시정지되었습니다.");
+// Pinia Store에서 상태 가져오기
+const isPaused = computed(() => store.isPaused);
+
+// 기타 상태 관리
+const timerIntervalId = ref(null); // 타이머 간격 ID
+const locationIntervalId = ref(null); // 위치 추적 간격 ID
+const elapsedTime = ref("00:00");
+const distance = ref(0);
+const pace = ref("0'00\"");
+
+// 런닝 시작
+const startRunning = () => {
+  store.init();
+  store.start();
+  startTimer();
+  startLocationTracking();
 };
 
-// 다시 시작 로직
-const resumeRunning = () => {
-  isPaused.value = false;
-  console.log("기록 측정이 재개되었습니다.");
-};
-
-// 정지 로직
+// 런닝 정지
 const stopRunning = () => {
-  console.log("기록 측정을 종료하고 결과 페이지로 이동합니다.");
-  router.push({ name: "runningResult" });
+  store.end();
+  clearIntervals();
+  store.resultSend(); // DB 전송
 };
+
+// 타이머 시작
+const startTimer = () => {
+  const startTime = Date.parse(store.runResult.startTime);
+
+  const updateTimer = () => {
+    if (isPaused.value) return; // 일시정지 상태면 타이머 업데이트 중단
+    const now = Date.now();
+    const pausedTime = store.pausedDuration * 1000;
+
+    const elapsed = Math.floor((now - startTime - pausedTime) / 1000);
+    if (elapsed >= 0) {
+      const minutes = Math.floor(elapsed / 60).toString().padStart(2, "0");
+      const seconds = (elapsed % 60).toString().padStart(2, "0");
+      elapsedTime.value = `${minutes}:${seconds}`;
+    } else {
+      elapsedTime.value = "00:00";
+    }
+  };
+
+  if (timerIntervalId.value) clearInterval(timerIntervalId.value);
+  timerIntervalId.value = setInterval(updateTimer, 1000);
+  updateTimer(); // 즉시 첫 업데이트 실행
+};
+
+// 위치 추적 시작
+const startLocationTracking = () => {
+  const updateLocation = () => {
+    if (!isPaused.value) {
+      store.getCurrentLocation();
+      distance.value = store.runResult.distance;
+    }
+  };
+
+  if (locationIntervalId.value) clearInterval(locationIntervalId.value);
+  locationIntervalId.value = setInterval(updateLocation, 5000);
+  updateLocation(); // 즉시 첫 업데이트 실행
+};
+
+// 일시정지
+const pauseRunning = () => {
+  store.pause();
+  store.getCurrentLocation(); // 위치 정보 추가
+  distance.value = store.runResult.distance; // 거리 갱신
+  clearInterval(timerIntervalId.value); // 타이머 멈춤
+};
+
+// 재개
+const resumeRunning = () => {
+  store.resume();
+  store.getCurrentLocation(); // 위치 정보 추가
+  distance.value = store.runResult.distance; // 거리 갱신
+  startTimer(); // 타이머 재개
+  startLocationTracking(); // 위치 추적 재개
+};
+
+const clearIntervals = () => {
+  if (timerIntervalId.value) clearInterval(timerIntervalId.value);
+  if (locationIntervalId.value) clearInterval(locationIntervalId.value);
+};
+
+onMounted(() => {
+  startRunning();
+});
+
+onUnmounted(() => {
+  clearIntervals();
+});
 </script>
+
+
+
+
+
 
 <style scoped>
 /* 전체 컨테이너 */
