@@ -19,6 +19,10 @@ export const useRunStore = defineStore("run", () => {
     distance: 0,
   });
 
+  /** lat long 추가*/
+  const latitude = ref(0);
+  const longitude = ref(0);
+
   const pausedDuration = ref(0);
   const lastPauseTime = ref(null);
   const isPaused = ref(false);
@@ -55,34 +59,95 @@ export const useRunStore = defineStore("run", () => {
       isPaused.value = false;
     }
   };
-
-  const getCurrentLocation = function () {
-    if (navigator.geolocation) {
+  
+  const getCurrentLocation = function (){
+    console.log(JSON.stringify(course.value))
+    if (longitude.value == 0 && navigator.geolocation){
       navigator.geolocation.getCurrentPosition(
         (position) => {
-          const latitude = position.coords.latitude;
-          const longitude = position.coords.longitude;
+          latitude.value = position.coords.latitude;
+          longitude.value = position.coords.longitude;
 
           course.value.push({ latitude, longitude });
-          addDistance();
         },
         (error) => {
           console.error("GPS 정보를 가져오는 데 실패했습니다.", error);
+        })
+      }
+      else {
+        // 자이로센서 및 가속도계 코드
+        if (window.DeviceMotionEvent) {
+          let lastTimestamp = null;
+          let velocityX = 0;
+          let velocityY = 0;
+    
+          window.addEventListener("devicemotion", (event) => {
+            if (!lastTimestamp) {
+              lastTimestamp = event.timeStamp;
+              return;
+            }
+    
+            // 시간 간격 계산
+            const dt = (event.timeStamp - lastTimestamp) / 1000; // 초 단위
+            lastTimestamp = event.timeStamp;
+    
+            // 가속도 데이터 가져오기
+            const accelerationX = event.acceleration.x || 0;
+            const accelerationY = event.acceleration.y || 0;
+    
+            // 속도 업데이트 (v = u + at)
+            velocityX += accelerationX * dt;
+            velocityY += accelerationY * dt;
+    
+            // 위치 업데이트 (s = ut + 0.5at^2)
+            const deltaX = velocityX * dt + 0.5 * accelerationX * dt * dt;
+            const deltaY = velocityY * dt + 0.5 * accelerationY * dt * dt;
+    
+            // 위도, 경도 업데이트
+            latitude.value += deltaY * 0.00001; // 임의의 변환 비율
+            longitude.value += deltaX * 0.00001;
+    
+            // 코스에 추가
+            course.value.push({ latitude: latitude.value, longitude: longitude.value });
+    
+            // 거리 갱신
+            const distance = Math.sqrt(deltaX ** 2 + deltaY ** 2); // 이동 거리 계산
+            runResult.value.distance += distance;
+          });
+        } else {
+          console.error("DeviceMotionEvent를 지원하지 않는 브라우저입니다.");
         }
-      );
-    }
-  };
+      }
+  }
 
-  const addDistance = function () {
-    const size = course.value.length;
-    if (size < 2 || isPaused.value) return; // 일시정지 상태에서 거리 계산 방지
+  /**추가 사항 */
+  // const getCurrentLocation = function () {
+  //   if (navigator.geolocation) {
+  //     navigator.geolocation.getCurrentPosition(
+  //       (position) => {
+  //         const latitude = position.coords.latitude;
+  //         const longitude = position.coords.longitude;
 
-    const diffLat = course.value[size - 2].latitude - course.value[size - 1].latitude;
-    const diffLon = course.value[size - 2].longitude - course.value[size - 1].longitude;
+  //         course.value.push({ latitude, longitude });
+  //         addDistance();
+  //       },
+  //       (error) => {
+  //         console.error("GPS 정보를 가져오는 데 실패했습니다.", error);
+  //       }
+  //     );
+  //   }
+  // };
 
-    const distanceBetween = Math.sqrt(Math.pow(diffLat, 2) + Math.pow(diffLon, 2));
-    runResult.value.distance += distanceBetween;
-  };
+  // const addDistance = function () {
+  //   const size = course.value.length;
+  //   if (size < 2 || isPaused.value) return; // 일시정지 상태에서 거리 계산 방지
+
+  //   const diffLat = course.value[size - 2].latitude - course.value[size - 1].latitude;
+  //   const diffLon = course.value[size - 2].longitude - course.value[size - 1].longitude;
+    
+  //   const distanceBetween = Math.sqrt(Math.pow(diffLat, 2) + Math.pow(diffLon, 2));
+  //   runResult.value.distance += distanceBetween;
+  // };
 
   const resultSend = function () {
     Swal.fire("잠시만 기다려 주세요...", "결과를 전송 중입니다.", "info");

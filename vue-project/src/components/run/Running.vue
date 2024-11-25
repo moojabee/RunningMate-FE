@@ -102,7 +102,7 @@ const startLocationTracking = () => {
       store.getCurrentLocation();
       distance.value = store.runResult.distance;
     }
-    console.log("distance : ", distance);
+    const size = store.course.length
   };
 
   if (locationIntervalId.value) clearInterval(locationIntervalId.value);
