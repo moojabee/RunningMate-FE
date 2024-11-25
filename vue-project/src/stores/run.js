@@ -60,65 +60,69 @@ export const useRunStore = defineStore("run", () => {
     }
   };
   
-  const getCurrentLocation = function (){
-    console.log(JSON.stringify(course.value))
-    if (longitude.value == 0 && navigator.geolocation){
+  const getCurrentLocation = function () {
+    if (longitude.value === 0 && navigator.geolocation) {
       navigator.geolocation.getCurrentPosition(
         (position) => {
           latitude.value = position.coords.latitude;
           longitude.value = position.coords.longitude;
-
+  
           course.value.push({ latitude, longitude });
+          addDistance();
         },
         (error) => {
           console.error("GPS 정보를 가져오는 데 실패했습니다.", error);
-        })
-      }
-      else {
-        // 자이로센서 및 가속도계 코드
-        if (window.DeviceMotionEvent) {
-          let lastTimestamp = null;
-          let velocityX = 0;
-          let velocityY = 0;
-    
-          window.addEventListener("devicemotion", (event) => {
-            if (!lastTimestamp) {
-              lastTimestamp = event.timeStamp;
-              return;
-            }
-    
-            // 시간 간격 계산
-            const dt = (event.timeStamp - lastTimestamp) / 1000; // 초 단위
-            lastTimestamp = event.timeStamp;
-    
-            // 가속도 데이터 가져오기
-            const accelerationX = event.acceleration.x || 0;
-            const accelerationY = event.acceleration.y || 0;
-    
-            // 속도 업데이트 (v = u + at)
-            velocityX += accelerationX * dt;
-            velocityY += accelerationY * dt;
-    
-            // 위치 업데이트 (s = ut + 0.5at^2)
-            const deltaX = velocityX * dt + 0.5 * accelerationX * dt * dt;
-            const deltaY = velocityY * dt + 0.5 * accelerationY * dt * dt;
-    
-            // 위도, 경도 업데이트
-            latitude.value += deltaY * 0.00001; // 임의의 변환 비율
-            longitude.value += deltaX * 0.00001;
-    
-            // 코스에 추가
-            course.value.push({ latitude: latitude.value, longitude: longitude.value });
-    
-            // 거리 갱신
-            const distance = Math.sqrt(deltaX ** 2 + deltaY ** 2); // 이동 거리 계산
-            runResult.value.distance += distance;
-          });
-        } else {
-          console.error("DeviceMotionEvent를 지원하지 않는 브라우저입니다.");
         }
+      );
+    } else {
+      // 자이로센서 및 가속도계 코드
+      if (window.DeviceMotionEvent) {
+        let lastTimestamp = null;
+        let velocityX = 0;
+        let velocityY = 0;
+  
+        window.addEventListener("devicemotion", (event) => {
+          if (!lastTimestamp) {
+            lastTimestamp = event.timeStamp;
+            return;
+          }
+  
+          // 시간 간격 계산
+          const dt = (event.timeStamp - lastTimestamp) / 1000; // 초 단위
+          lastTimestamp = event.timeStamp;
+  
+          // 가속도 데이터 가져오기
+          const accelerationX = event.acceleration.x || 0;
+          const accelerationY = event.acceleration.y || 0;
+  
+          // 속도 업데이트 (v = u + at)
+          velocityX += accelerationX * dt;
+          velocityY += accelerationY * dt;
+  
+          // 거리 계산 (s = ut + 0.5at^2)
+          const deltaX = velocityX * dt + 0.5 * accelerationX * dt * dt; // x축 이동 거리 (m)
+          const deltaY = velocityY * dt + 0.5 * accelerationY * dt * dt; // y축 이동 거리 (m)
+  
+          // 위도/경도 변환
+          const deltaLatitude = deltaY / 111000; // 위도의 변화량
+          const deltaLongitude = deltaX / (111000 * Math.cos((latitude.value * Math.PI) / 180)); // 경도의 변화량
+  
+          // 위도/경도 업데이트
+          latitude.value += deltaLatitude;
+          longitude.value += deltaLongitude;
+  
+          // 코스에 추가
+          course.value.push({ latitude: latitude.value, longitude: longitude.value });
+  
+          // 이동 거리 갱신 (m → km 변환)
+          const distance = Math.sqrt(deltaX ** 2 + deltaY ** 2) / 1000; // 이동 거리 (km 단위)
+          runResult.value.distance += distance; // 누적 거리
+        });
+      } else {
+        console.error("DeviceMotionEvent를 지원하지 않는 브라우저입니다.");
       }
-  }
+    }
+  };
 
   /**추가 사항 */
   // const getCurrentLocation = function () {
