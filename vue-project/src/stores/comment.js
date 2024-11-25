@@ -2,8 +2,6 @@ import { ref } from 'vue';
 import { defineStore } from 'pinia';
 import axios from 'axios';
 
-axios.defaults.withCredentials = true;
-
 const REST_API_URL=import.meta.env.VITE_REST_API_URL + "/comment"
 
 export const useCommentStore = defineStore('comment', () => {

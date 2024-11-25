@@ -11,7 +11,7 @@
                     <div class="chat-room-text">
                         <!-- 채팅방 이름 -->
                         <span class="chat-room-name">
-                            {{ room.roomName }}
+                            {{ getRoomName(room) }}
                         </span>
 
                         <!-- 최근 메시지 -->
@@ -36,10 +36,10 @@
 <script setup>
     import router from '@/router';
     import { useChatRoomStore } from '@/stores/chatRoom';
-    import { onMounted } from 'vue';
+    import { computed, onMounted } from 'vue';
 
     const store = useChatRoomStore();
-
+    const userId = sessionStorage.getItem('userId')
     const fetchChatRoomList = function() {
         store.loadChatRoomList();
     };
@@ -79,23 +79,33 @@
         cancelButtonText: "취소", // 취소 버튼 텍스트
     });
 
-    if (result.isConfirmed) {
-        store.leaveChatRoom({roomId: room.roomId,});
-        Swal.fire({
-        title: "나갔습니다!",
-        text: `채팅방 '${room.roomName}'에서 나왔습니다.`,
-        icon: "success",
-        timer: 2000,
-        showConfirmButton: false,
-        });
-    }
+        if (result.isConfirmed) {
+            store.leaveChatRoom({roomId: room.roomId,});
+            Swal.fire({
+            title: "나갔습니다!",
+            text: `채팅방 '${room.roomName}'에서 나왔습니다.`,
+            icon: "success",
+            timer: 2000,
+            showConfirmButton: false,
+            });
+        }
     };
 
+    // computed로 채팅방 이름을 계산하는 변수
+    const getRoomName = computed(() => {
+    return (room) => {
+        if (room.roomType == 'PERSONAL') {
+        // 'PERSONAL'일 때, userList에서 나와 일치하지 않는 상대방의 userNick을 반환
+        const otherUser = room.userList.find(user => user.userId != userId);
+        room.roomName = otherUser ? `[개인] ${otherUser.nickname}` : '알 수 없음';
+        return otherUser ? `[개인] ${otherUser.nickname}` : '알 수 없음'; // 상대방 userNick 또는 '알 수 없음'
+        }
+        return `[그룹] ${room.roomName}`; // 'PERSONAL'이 아닐 때는 기본 roomName
+    };
+    });
 
     onMounted(() => fetchChatRoomList());
 </script>
-
-
 <style scoped>
 .chat-room-container {
     padding: 20px;

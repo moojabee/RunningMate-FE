@@ -164,13 +164,13 @@ const goBack = () => {
 /* 이미지 미리보기 */
 .image-preview-wrapper {
   position: relative;
-  width: 100px;
-  height: 100px;
+  width: 120px;
+  height: 120px;
 }
 
 .image-preview img {
-  width: 100%;
-  height: 100%;
+  width: 120px;
+  height: 120;
   object-fit: cover;
   border-radius: 5px;
   border: 1px solid #ddd;
@@ -199,9 +199,9 @@ const goBack = () => {
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 100px;
-  height: 100px;
-  border: 1px dashed #ddd;
+  width: 120px;
+  height: 120px;
+  border: 2px dashed #ddd;
   border-radius: 5px;
   font-size: 2.5rem;
   color: #ddd;
@@ -211,8 +211,8 @@ const goBack = () => {
 .add-image::before {
   content: '+'; /* 텍스트를 직접 추가 */
   position: absolute;
-  top: 18%; /* 텍스트를 위로 이동 */
-  font-size: 2.5rem;
+  top: 15%; /* 텍스트를 위로 이동 */
+  font-size: 3rem;
   color: #ddd;
 }
 

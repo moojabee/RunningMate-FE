@@ -6,45 +6,49 @@
         <img src="@/assets/chat/back.png" alt="뒤로" class="back-icon" />
       </button>
       <h2 class="room-title">{{ roomName }}</h2>
-      <button class="menu-button" @click="goBack">
-        <img src="@/assets/chat/menu.png" alt="뒤로" class="menu-icon" />
+      <button class="menu-button" @click="toggleModal">
+        <img src="@/assets/chat/menu.png" alt="메뉴" class="menu-icon" />
       </button>
     </header>
 
+    <!-- 모달 배경 -->
+    <div v-bind:class="{'modal-overlay': true, 'active': isModalOpen}" @click="toggleModal"></div>
+
+      <!-- 모달 -->
+      <div v-bind:class="{'modal': true, 'open': isModalOpen}">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h3 class="modal-header-title">대화 상대</h3>
+            <button class="modal-header-quit" @click="toggleModal">X</button>
+          </div>
+          <!-- 참여자 목록-->
+          <div class="friends-list">
+            <div v-for="user in userList" :key="user.userId" class="friend-item">
+              <img :src="user.userImg || defaultProfileImg" alt="프로필 이미지" class="friend-photo" />
+              <span class="friend-nickname">{{ user.nickname }}</span>
+              <button class="profile-button" @click="goToProfile(user.userId)">프로필</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
     <!-- 채팅 리스트 -->
     <ul class="chat-list" ref="messageList">
-      
       <li
         class="list-group-item"
         v-for="(msg, index) in messages"
         :key="index"
         :class="{ 'my-message': msg.userId == userId, 'other-message': msg.userId != userId, 'notice': msg.userId == '[알림]' }">
-        
-        <div class="sender-info" v-if="msg.userId != userId" >
-          <img
-              v-if="msg.userImg"
-              :src="msg.userImg"
-              alt="프로필 이미지"
-              style="width: 30px; height: 30px; object-fit: cover; border-radius: 20%;"
-            />
-            <img
-              v-else
-              src="@/assets/default-profile.png"
-              alt="기본 프로필 이미지"
-              style="width: 30px; height: 30px; object-fit: cover; border-radius: 20%;"
-        />
-        <span class="nickname">
-          {{ msg.nickname }}
-        </span>
+        <div class="sender-info" v-if="msg.userId != userId">
+          <img v-if="msg.userImg" :src="msg.userImg" alt="프로필 이미지" style="width: 30px; height: 30px; object-fit: cover; border-radius: 20%;" />
+          <img v-else src="@/assets/default-profile.png" alt="기본 프로필 이미지" style="width: 30px; height: 30px; object-fit: cover; border-radius: 20%;" />
+          <span class="nickname">{{ msg.nickname }}</span>
         </div>
 
-        <span
-          class="message-time"
-          :class="{ 'time-my-message': msg.userId == userId, 'time-other-message': msg.userId != userId }"
-        >
+        <span class="message-time" :class="{ 'time-my-message': msg.userId == userId, 'time-other-message': msg.userId != userId }">
           {{ formatTime(msg.sendedDate) }}
         </span>
-        <!-- 메시지 내용 -->
+
         <div class="message-box">{{ msg.content }}</div>
       </li>
     </ul>
@@ -52,16 +56,8 @@
     <!-- 푸터 -->
     <footer class="chat-footer">
       <div class="input-group">
-        <input
-          type="text"
-          class="form-control"
-          v-model="message"
-          @keypress.enter="sendMessage"
-          placeholder="메시지를 입력하세요"
-        />
-        <button class="btn btn-primary send-button" type="button" @click="sendMessage">
-          전송
-        </button>
+        <input type="text" class="form-control" v-model="message" @keypress.enter="sendMessage" placeholder="메시지를 입력하세요" />
+        <button class="btn btn-primary send-button" type="button" @click="sendMessage">전송</button>
       </div>
     </footer>
   </div>
@@ -74,12 +70,12 @@ import Stomp from 'stompjs';
 import { useRoute } from 'vue-router';
 import { useChatRoomStore } from '@/stores/chatRoom';
 import router from '@/router';
+import defaultProfileImg from '@/assets/default-profile.png';
 
 // Vue Router에서 roomId 가져오기
 const route = useRoute();
 const roomId = ref(route.params.roomId);
 const roomName = ref(route.params.roomName)
-const chatRoomInfo = ref();
 const REST_API_URL=import.meta.env.VITE_REST_API_URL;
 
 // Pinia Store 사용
@@ -91,7 +87,6 @@ const messages = computed(() => chatRoomStore.chatMessage);
 const userId = computed(() => sessionStorage.getItem('userId'));
 const stompClient = ref(null);
 const messageList = ref(null);
-const isLoad = ref(false);
 
 // 시간을 시:분:초 형식으로 변환하는 함수
 const formatTime = (dateTime) => {
@@ -99,13 +94,28 @@ const formatTime = (dateTime) => {
   const date = new Date(dateTime);
   const hours = String(date.getHours()).padStart(2, '0');
   const minutes = String(date.getMinutes()).padStart(2, '0');
-  const seconds = String(date.getSeconds()).padStart(2, '0');
   return `${hours}:${minutes}`;
+};
+
+// 모달 정보
+const isModalOpen = ref(false);
+
+// 참여자 리스트
+const userList = computed(()=> chatRoomStore.userListInChat)
+
+// 모달 열기/닫기 함수
+const toggleModal = () => {
+  console.log(userList.value);
+  isModalOpen.value = !isModalOpen.value;
 };
 
 const goBack = () => {
   router.back();
 };
+
+const goToProfile = function(userId){
+  router.push({name :'myBoard' , params: { userId: userId }})
+}
 
 // STOMP 연결 함수
 const connect = () => {
@@ -168,7 +178,6 @@ const sendMessage = () => {
 
 // 메시지 수신 처리 함수
 const recvMessage = (receivedMessage) => {
-  console.log(receivedMessage)
   messages.value.push({
     userId: receivedMessage.messageType == 'ENTER' ? '[알림]' : receivedMessage.userId,
     content: receivedMessage.content,
@@ -201,6 +210,7 @@ const loadPreviousChats = async () => {
 onMounted(() => {
   loadPreviousChats();
   connect();
+  chatRoomStore.loadUserListInChat(roomId.value)
 });
 
 onUnmounted(()=>{
@@ -298,9 +308,9 @@ onUnmounted(()=>{
 .room-title{
   font-size: 0.8em;
   white-space: nowrap; /* 한 줄로 표시 */
-    overflow: hidden; /* 넘친 텍스트 숨김 */
-    text-overflow: ellipsis; /* 넘친 텍스트를 '...'으로 표시 */
-    max-width: 300px; /* 텍스트가 차지할 최대 너비 설정 */
+  overflow: hidden; /* 넘친 텍스트 숨김 */
+  text-overflow: ellipsis; /* 넘친 텍스트를 '...'으로 표시 */
+  max-width: 300px; /* 텍스트가 차지할 최대 너비 설정 */
 }
 
 /* 채팅 리스트 스타일 */
@@ -377,5 +387,120 @@ onUnmounted(()=>{
   right: -35px; /* 상대 메시지 시간은 오른쪽 */
 }
 
+/* 모달 오버레이 (어두운 배경) */
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.5);
+  display: none;
+  z-index: 999;
+}
+
+.modal-overlay.active {
+  display: block;
+}
+/* 모달 스타일 */
+.modal {
+  position: fixed;
+  top: 3em; /* chat-header 아래 */
+  right: 0;
+  width: 75%; /* 오른쪽 절반 차지 */
+  height: calc(100vh - 6em); /* 화면에서 헤더와 푸터를 제외한 높이 */
+  background-color: white;
+  display: none;
+  z-index: 1000;
+  transition: transform 0.3s ease;
+  transform: translateX(100%);
+  border-radius: 10px; /* 모서리 둥글게 */
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2); /* 그림자 효과 */
+}
+
+.modal.open {
+  display: block;
+  transform: translateX(0);
+}
+
+.modal-content {
+  padding: 20px;
+  overflow-y: auto;
+  height: 100%;
+  border-radius: 10px; /* 모서리 둥글게 */
+}
+
+/* 모달 헤더 스타일 */
+.modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding-bottom: 10px;
+  border-bottom: 2px solid #f1f1f1; /* 헤더 하단에 라인 추가 */
+}
+
+.modal-header-title {
+  font-size: 1.5em;
+  font-weight: bold;
+  color: #333;
+}
+
+.modal-header-quit {
+  background-color: #ff5722; /* 붉은색 */
+  color: white;
+  border: none;
+  border-radius: 50%;
+  width: 30px;
+  height: 30px;
+  font-size: 1.2em;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.modal-header-quit:hover {
+  background-color: #f44336; /* 붉은색을 조금 어두운 색으로 변경 */
+}
+
+/* 친구 리스트 스타일 */
+.friends-list {
+  margin-top: 20px;
+}
+
+.friend-item {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+  padding: 10px;
+  border-bottom: 1px solid #ddd;
+  justify-content: flex-end; /* 항목들을 오른쪽 정렬 */
+}
+
+.friend-photo {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  object-fit: cover;
+  margin-left: 15px; /* 사진과 다른 항목 간의 간격 */
+}
+
+.friend-nickname {
+  font-size: 1.1em;
+  color: #333;
+  flex-grow: 1; /* 닉네임이 가능한 공간을 모두 차지하도록 설정 */
+}
+
+.profile-button {
+  background-color: #007bff;
+  color: white;
+  padding: 5px 10px;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.profile-button:hover {
+  background-color: #0056b3;
+}
 
 </style>
