@@ -38,13 +38,23 @@
       <div class="input-group">
         <label for="inviteName">초대할 사람</label>
         <div class="invite-input">
+          <!-- 팔로워 목록에서 선택할 수 있는 드롭다운 -->
+          <select v-model="inviteName" class="invite-dropdown">
+            <option value="" disabled>팔로워를 선택하세요</option>
+            <option v-for="follower in followerList" :key="follower.userId" :value="follower.nickname">
+              {{ follower.nickname }}
+            </option>
+          </select>
+
+          <!-- 직접 입력 -->
           <input
             id="inviteName"
             type="text"
-            placeholder="초대할 사람 이름"
+            placeholder="직접 입력"
             v-model.trim="inviteName"
           />
-          <button @click="addInvitee" class="add-button">초대</button>
+
+          <button @click="addInvitee" class="add-button">+</button>
         </div>
       </div>
   
@@ -73,17 +83,21 @@
   
   <script setup>
   import { useChatRoomStore } from "@/stores/chatRoom";
-import Swal from "sweetalert2";
-  import { computed, ref } from "vue";
+  import { useMyPageStore } from "@/stores/myPage";
+  import Swal from "sweetalert2";
+  import { computed, onMounted, ref } from "vue";
   
   const store = useChatRoomStore();
-  
+  const myPageStore = useMyPageStore();
+  const followerList = computed(()=> myPageStore.followerList)
+
   // 상태 관리
   const roomName = ref("");
   const roomType = ref("PRIVATE"); // 기본값 PRIVATE
   const inviteName = ref(""); // 초대할 사람 이름
   const invitees = ref([]); // 초대 명단 배열
-  
+  const userId =ref(sessionStorage.getItem('userId'));
+
   const chatRoomCreateDto = computed(() => ({
     roomName: roomName.value,
     roomType: roomType.value,
@@ -151,6 +165,10 @@ import Swal from "sweetalert2";
       store.createChatRoom(chatRoomCreateDto.value);
     });
   };
+
+  onMounted(()=>{
+    myPageStore.getFollower(userId.value);
+  })
   </script>
   
   <style scoped>
