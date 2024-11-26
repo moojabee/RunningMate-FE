@@ -120,6 +120,7 @@ export const useChatRoomStore = defineStore('chatRoom', () => {
         .then((res)=>{
             console.log("chatRoom : " , res.data);
             chatRoomInfo = res.data;
+            console.log(chatRoomInfo)
         })
         .catch((err)=>{
             console.log(err);

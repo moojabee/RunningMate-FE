@@ -36,7 +36,7 @@
 <script setup>
     import router from '@/router';
     import { useChatRoomStore } from '@/stores/chatRoom';
-    import { onMounted } from 'vue';
+    import { onMounted} from 'vue';
 
     const store = useChatRoomStore();
 
@@ -90,8 +90,6 @@
         });
     }
     };
-
-
     onMounted(() => fetchChatRoomList());
 </script>
 
