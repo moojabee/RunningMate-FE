@@ -6,17 +6,17 @@
                 <div class="chat-room-info">
                     <!-- 동그란 채팅방 사진 -->
                     <img
-                        v-if="room.userList[1].userImg"
+                        v-if="room.userList.length > 1 && room.userList[room.userList.length - 1].userImg"
                         :src="room.userList[1].userImg"
                         alt="프로필 이미지"
                         class="chat-room-image"
-                        />
+                    />
                     <img
                         v-else
                         src="@/assets/default-profile.png"
                         alt="기본 프로필 이미지"
                         class="chat-room-image"
-                        />
+                    />
                     <!-- 방 이름과 최근 메시지 -->
                     <div class="chat-room-text">
                         <!-- 채팅방 이름 -->
