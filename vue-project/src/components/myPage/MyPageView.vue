@@ -251,7 +251,7 @@ watch(
 }
 
 .update-btn {
-  background-color: #507efd;
+  background-color: #5690ff;
   color: white;
   padding: 8px 10px;
   border: none;

@@ -11,9 +11,6 @@
         <p class="label">시간</p>
       </div>
     </div>
-    <div v-for="(point, index) in store.course" :key="index">
-      <p>위도: {{ point.latitude }}, 경도: {{ point.longitude }}</p>
-    </div>
     <!-- 거리 정보 -->
     <div class="distance">
       <p class="value">{{ distance.toFixed(2) }}</p>

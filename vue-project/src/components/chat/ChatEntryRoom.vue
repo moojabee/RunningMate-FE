@@ -269,14 +269,11 @@ onUnmounted(()=>{
 
 .send-button {
   padding: 10px 20px;
-  background-color: #007bff;
+  background-color: #ff7f0d;
   color: white;
   border: none;
   border-radius: 5px;
-}
-
-.send-button:hover {
-  background-color: #0056b3;
+  font-weight: bold;
 }
 
 .back-button {
@@ -317,7 +314,7 @@ onUnmounted(()=>{
 .chat-list {
   flex: 1;
   overflow-y: auto;
-  background-color: #b2c7d9; /* 배경색 유지 */
+  background-color: #ffffff; /* 배경색 유지 */
   padding: 0.5em;
   list-style: none;
   display: flex;
@@ -355,7 +352,7 @@ onUnmounted(()=>{
 }
 
 .message-box{
-  background-color: #fee500;
+  background-color: #ffe1ba;
   border-radius: 5px;
   padding: 10px;
   max-width: 20em;
@@ -490,17 +487,13 @@ onUnmounted(()=>{
 }
 
 .profile-button {
-  background-color: #007bff;
+  background-color: #5690ff;
   color: white;
   padding: 5px 10px;
   border: none;
   border-radius: 5px;
   cursor: pointer;
   transition: background-color 0.3s ease;
-}
-
-.profile-button:hover {
-  background-color: #0056b3;
 }
 
 </style>

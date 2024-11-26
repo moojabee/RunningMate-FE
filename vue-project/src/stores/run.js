@@ -166,37 +166,6 @@ export const useRunStore = defineStore("run", () => {
       }
     }
   };
-  
-  
-
-  /**추가 사항 */
-  // const getCurrentLocation = function () {
-  //   if (navigator.geolocation) {
-  //     navigator.geolocation.getCurrentPosition(
-  //       (position) => {
-  //         const latitude = position.coords.latitude;
-  //         const longitude = position.coords.longitude;
-
-  //         course.value.push({ latitude, longitude });
-  //         addDistance();
-  //       },
-  //       (error) => {
-  //         console.error("GPS 정보를 가져오는 데 실패했습니다.", error);
-  //       }
-  //     );
-  //   }
-  // };
-
-  // const addDistance = function () {
-  //   const size = course.value.length;
-  //   if (size < 2 || isPaused.value) return; // 일시정지 상태에서 거리 계산 방지
-
-  //   const diffLat = course.value[size - 2].latitude - course.value[size - 1].latitude;
-  //   const diffLon = course.value[size - 2].longitude - course.value[size - 1].longitude;
-    
-  //   const distanceBetween = Math.sqrt(Math.pow(diffLat, 2) + Math.pow(diffLon, 2));
-  //   runResult.value.distance += distanceBetween;
-  // };
 
   const resultSend = async function () {
     Swal.fire("잠시만 기다려 주세요...", "결과를 전송 중입니다.", "info");
@@ -238,7 +207,6 @@ export const useRunStore = defineStore("run", () => {
       });
     }
   };
-  
   
   
   const formatToLocalDateTime = (isoTime) => {
