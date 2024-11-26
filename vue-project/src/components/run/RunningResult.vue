@@ -4,7 +4,6 @@
     <div class="header">
       <button class="back-button" @click="goBack">←</button>
       <p class="date">{{ runningData.date }}</p>
-      <button class="back-button">←</button>
     </div>
 
     <!-- 거리 정보 -->
@@ -25,47 +24,88 @@
       </div>
     </div>
 
-    <!-- 기타 정보 -->
-    <div class="extra-info">
-      <div class="info-item">
-        <p class="value">{{ runningData.elevation }}</p>
-        <p class="label">고도 상승</p>
-      </div>
-      <div class="info-item">
-        <p class="value">{{ runningData.calories }}</p>
-        <p class="label">칼로리</p>
-      </div>
-    </div>
-
-    <!-- 경로 이미지 -->
+    <!-- 경로 지도 -->
     <div class="route-map">
-      <img :src="runningData.mapImage" alt="Running Route" />
+      <KakaoMap :lat="mapCenter.lat" :lng="mapCenter.lng" @onLoadKakaoMap="onLoadKakaoMap" style="width: 100%; height: 400px">
+        <KakaoMapPolyline :latLngList="latLngList" />
+      </KakaoMap>
     </div>
   </div>
 </template>
 
 <script setup>
-import { ref } from "vue";
+import { computed } from "vue";
+import { KakaoMap, KakaoMapPolyline } from "vue3-kakao-maps";
+import { useRunStore } from "@/stores/run";
 import { useRouter } from "vue-router";
 
+const store = useRunStore();
 const router = useRouter();
 
-// 런닝 기록 데이터 (샘플 데이터, API 연동 시 업데이트 가능)
-const runningData = ref({
-  date: "2024. 10. 29.",
-  distance: "2.98",
-  pace: "6'50''",
-  time: "20:25",
-  elevation: "20m",
-  calories: "195",
-  mapImage: "@/assets/run/map.png", // 경로 이미지
+// 날짜 포맷 함수
+const formatDate = (isoDate) => {
+  const date = new Date(isoDate);
+  return isNaN(date) ? "" : `${date.getFullYear()}. ${date.getMonth() + 1}. ${date.getDate()}.`;
+};
+
+// 시간 포맷 함수
+const formatTime = (startTime, endTime) => {
+  const elapsedTime = Math.floor((new Date(endTime) - new Date(startTime)) / 1000);
+  const minutes = Math.floor(elapsedTime / 60).toString().padStart(2, "0");
+  const seconds = (elapsedTime % 60).toString().padStart(2, "0");
+  return `${minutes}:${seconds}`;
+};
+
+// 페이스 계산 함수
+const calculatePace = (distance, elapsedTime) => {
+  if (distance <= 0 || elapsedTime <= 0) return "0'00''";
+  const totalSecondsPerKm = elapsedTime / distance;
+  return `${Math.floor(totalSecondsPerKm / 60)}'${(totalSecondsPerKm % 60).toFixed(0).padStart(2, "0")}''`;
+};
+
+// 런닝 데이터
+const runningData = computed(() => {
+  const startTime = store.runResult.startTime;
+  const endTime = store.runResult.endTime;
+  return {
+    date: formatDate(startTime),
+    distance: store.runResult.distance.toFixed(2),
+    pace: calculatePace(
+      store.runResult.distance,
+      Math.floor((new Date(endTime) - new Date(startTime)) / 1000)
+    ),
+    time: formatTime(startTime, endTime),
+    course: store.course,
+  };
 });
+
+// 경로 지도 중심 좌표 설정
+const mapCenter = computed(() => ({
+  lat: store.course?.[0]?.latitude || 37.450701,
+  lng: store.course?.[0]?.longitude || 126.570667,
+}));
+
+// KakaoMapPolyline에 사용할 좌표 리스트 생성
+const latLngList = computed(() =>
+  store.course.map((point) => ({
+    lat: point.latitude,
+    lng: point.longitude,
+  }))
+);
+
+// KakaoMap 로드 시 호출
+const onLoadKakaoMap = (mapRef) => {
+  const mapTypeControl = new kakao.maps.MapTypeControl();
+  mapRef.addControl(mapTypeControl, kakao.maps.ControlPosition.TOPRIGHT);
+  console.log("Polyline Coordinates: ", latLngList.value);
+};
 
 // 뒤로 가기
 const goBack = () => {
   router.push({ name: "run" });
 };
 </script>
+
 
 <style scoped>
 /* 전체 컨테이너 */

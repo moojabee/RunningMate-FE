@@ -11,7 +11,9 @@
         <p class="label">시간</p>
       </div>
     </div>
-
+    <div v-for="(point, index) in store.course" :key="index">
+      <p>위도: {{ point.latitude }}, 경도: {{ point.longitude }}</p>
+    </div>
     <!-- 거리 정보 -->
     <div class="distance">
       <p class="value">{{ distance.toFixed(2) }}</p>
@@ -106,7 +108,7 @@ const startLocationTracking = () => {
   };
 
   if (locationIntervalId.value) clearInterval(locationIntervalId.value);
-  locationIntervalId.value = setInterval(updateLocation, 5000);
+  locationIntervalId.value = setInterval(updateLocation, 2000);
   updateLocation(); // 즉시 첫 업데이트 실행
 };
 

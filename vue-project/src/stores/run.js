@@ -2,6 +2,7 @@ import { ref } from "vue";
 import { defineStore } from "pinia";
 import axios from "axios";
 import Swal from "sweetalert2";
+import router from '@/router'
 
 const REST_API_URL = import.meta.env.VITE_REST_API_URL;
 
@@ -84,7 +85,7 @@ export const useRunStore = defineStore("run", () => {
     runResult.value.distance += distanceBetween;
   };
 
-  const resultSend = function () {
+  const resultSend = async function () {
     Swal.fire("잠시만 기다려 주세요...", "결과를 전송 중입니다.", "info");
   
     const formattedRunResult = {
@@ -93,33 +94,38 @@ export const useRunStore = defineStore("run", () => {
       endTime: formatToLocalDateTime(runResult.value.endTime),
     };
   
-    console.log("Formatted Run Result: ", formattedRunResult); // 디버깅 로그 추가
-  
-    axios({
-      url: `${REST_API_URL}/run/record`,
-      method: "POST",
-      data: formattedRunResult,
-      headers: getAuthHeaders(),
-    })
-      .then(() => {
-        console.log("결과 전송 성공!");
-        Swal.fire({
-          icon: "success",
-          title: "완료",
-          text: "결과 전송 완료",
-        }).then(() => {
-          window.location.href = "/runningResult";
-        });
-      })
-      .catch((error) => {
-        console.error("결과 전송 실패: ", error.response?.data || error.message);
-        Swal.fire({
-          icon: "error",
-          title: "오류",
-          text: "결과 전송 실패",
-        });
+    try {
+      const response = await axios({
+        url: `${REST_API_URL}/run/record`,
+        method: "POST",
+        data: formattedRunResult,
+        headers: getAuthHeaders(),
       });
+  
+      const savedResult = response.data;
+      runResult.value = savedResult; // 응답 데이터 저장
+      course.value = [...course.value]; // 코스 데이터 유지
+      console.log("결과 : ", runResult.value);
+      console.log("course값 : ", course.value);
+  
+      Swal.fire({
+        icon: "success",
+        title: "완료",
+        text: "결과 전송 완료",
+      }).then(() => {
+        // SPA 방식으로 페이지 전환
+        router.push({ name: "runningResult" });
+      });
+    } catch (error) {
+      console.error("결과 전송 실패: ", error.response?.data || error.message);
+      Swal.fire({
+        icon: "error",
+        title: "오류",
+        text: "결과 전송 실패",
+      });
+    }
   };
+  
   
   
   const formatToLocalDateTime = (isoTime) => {
