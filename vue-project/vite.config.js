@@ -20,24 +20,24 @@ export default defineConfig({
   optimizeDeps: {
     include: ['swiper/vue'],
   },
-  build: {
-    outDir: 'dist', // 빌드 결과물 디렉터리 설정
-    rollupOptions: {
-      output: {
-        assetFileNames: '[name][extname]', // 정적 파일 이름 규칙
-      },
-    },
-  },
-  server: {
+  // build: {
+  //   outDir: 'dist', // 빌드 결과물 디렉터리 설정
+  //   rollupOptions: {
+  //     output: {
+  //       assetFileNames: '[name][extname]', // 정적 파일 이름 규칙
+  //     },
+  //   },
+  // },
+  // server: {
 
-    proxy: {
-      '/': {
-        target: 'https://www.runningmate.shop',  // Spring Boot 서버의 실제 IP로 변경 (https:// 추가)
-        changeOrigin: true,
-        rewrite: (path) => path.replace(/^\/api/, ''),  // /api 제거
-        secure: true,  // secure를 true로 설정 (https 요청이므로)
-      },
-    },
-  }
+  //   proxy: {
+  //     '/': {
+  //       target: 'https://www.runningmate.shop',  // Spring Boot 서버의 실제 IP로 변경 (https:// 추가)
+  //       changeOrigin: true,
+  //       rewrite: (path) => path.replace(/^\/api/, ''),  // /api 제거
+  //       secure: true,  // secure를 true로 설정 (https 요청이므로)
+  //     },
+  //   },
+  // }
 });
   
