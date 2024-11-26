@@ -5,8 +5,8 @@
 
     <!-- 문구 -->
     <div v-show="!isCounting" class="main-text">
-      <p class="headline">Life's Short</p>
-      <p class="subline">We Run!</p>
+      <p class="headline">Together!</p>
+      <p class="subline">To You!</p>
     </div>
 
     <!-- 시작 버튼 -->
@@ -135,7 +135,7 @@ const startCountdown = () => {
     opacity: 0.9;
   }
   100% {
-    transform: scale(1.3);
+    transform: scale(1.5);
     opacity: 1;
   }
 }

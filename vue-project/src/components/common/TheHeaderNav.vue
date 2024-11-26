@@ -11,7 +11,7 @@
   
       <!-- 사용자 이름과 로그아웃 버튼 -->
       <div class="user-info">
-        <span>{{ userNickname }}님</span>
+        <span class="user-nickname">{{ userNickname }}님 </span>
         <button @click="userAuthStore.logout" class="logout-button">로그아웃</button>
       </div>
     </div>
@@ -36,7 +36,7 @@
     align-items: center;
     justify-content: space-between; /* 왼쪽과 오른쪽 정렬 */
     padding: 10px 20px; /* 내부 여백 */
-    background-color: #f8f8f8; /* 배경색 */
+    background-color: #ffffff; /* 배경색 */
     border-bottom: 1px solid #ccc; /* 구분선 */
   }
   
@@ -59,12 +59,17 @@
     align-items: center;
     gap: 10px; /* 텍스트와 버튼 사이 간격 */
   }
+
+  .user-nickname {
+    font-weight: bold;
+  }
   
   .logout-button {
     padding: 5px 10px;
     font-size: 14px;
-    color: white;
-    background-color: #ff5722;
+    color: #555;
+    background-color: #ffffff;
+    box-shadow: 0 1px 5px rgba(0, 0, 0, 0.4);
     border: none;
     border-radius: 5px;
     cursor: pointer;

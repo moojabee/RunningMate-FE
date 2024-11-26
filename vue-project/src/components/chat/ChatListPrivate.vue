@@ -5,8 +5,18 @@
                 <!-- 채팅방 사진과 텍스트 -->
                 <div class="chat-room-info">
                     <!-- 동그란 채팅방 사진 -->
-                    <img src="@/assets/default-profile.png" alt="Room Image" class="chat-room-image" />
-
+                    <img
+                        v-if="room.userList[1].userImg"
+                        :src="room.userList[1].userImg"
+                        alt="프로필 이미지"
+                        class="chat-room-image"
+                        />
+                    <img
+                        v-else
+                        src="@/assets/default-profile.png"
+                        alt="기본 프로필 이미지"
+                        class="chat-room-image"
+                        />
                     <!-- 방 이름과 최근 메시지 -->
                     <div class="chat-room-text">
                         <!-- 채팅방 이름 -->
@@ -104,7 +114,10 @@
     };
     });
 
-    onMounted(() => fetchChatRoomList());
+    onMounted(() => {
+    fetchChatRoomList()
+    console.log(store.chatRoomList.value)
+    });
 </script>
 <style scoped>
 .chat-room-container {
@@ -131,7 +144,7 @@ hr {
     align-items: center;
     padding: 10px 15px;
     margin-bottom: 15px;
-    background-color: #f9f9f9;
+    background-color: #ffffff;
     border: 1px solid #ddd;
     border-radius: 10px;
     box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
@@ -168,7 +181,7 @@ hr {
 .chat-room-name {
     font-size: 1em; /* 채팅방 이름 크기 */
     font-weight: bold;
-    color: #ff4d4d;
+    color: #555;
     margin-bottom: 5px; /* 이름과 내용 간격 추가 */
     white-space: nowrap; /* 한 줄로 표시 */
     overflow: hidden; /* 넘치는 내용 숨김 */
@@ -177,7 +190,7 @@ hr {
 }
 
 .last-chat-content {
-    font-size: 0.5em; /* 최근 메시지는 작게 */
+    font-size: 0.8em; /* 최근 메시지는 작게 */
     color: #555;
     white-space: nowrap; /* 한 줄로 표시 */
     overflow: hidden; /* 넘치는 내용 숨김 */
@@ -202,7 +215,7 @@ hr {
 
 .leave-button {
     padding: 5px 10px;
-    background-color: #ff4d4d;
+    background-color: #ff9561;
     color: white;
     border: none;
     border-radius: 5px;
@@ -211,7 +224,4 @@ hr {
     transition: background-color 0.2s;
 }
 
-.leave-button:hover {
-    background-color: #ff3333;
-}
 </style>

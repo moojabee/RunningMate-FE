@@ -11,7 +11,6 @@
         <p class="label">시간</p>
       </div>
     </div>
-
     <!-- 거리 정보 -->
     <div class="distance">
       <p class="value">{{ distance.toFixed(2) }}</p>
@@ -106,7 +105,7 @@ const startLocationTracking = () => {
   };
 
   if (locationIntervalId.value) clearInterval(locationIntervalId.value);
-  locationIntervalId.value = setInterval(updateLocation, 5000);
+  locationIntervalId.value = setInterval(updateLocation, 2000);
   updateLocation(); // 즉시 첫 업데이트 실행
 };
 
