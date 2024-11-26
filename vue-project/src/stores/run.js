@@ -60,7 +60,6 @@ export const useRunStore = defineStore("run", () => {
       isPaused.value = false;
     }
   };
-  
   const getCurrentLocation = function () {
     if (longitude.value == 0 && navigator.geolocation) {
       navigator.geolocation.getCurrentPosition(
@@ -86,8 +85,8 @@ export const useRunStore = defineStore("run", () => {
         // 감속 계수 설정 (빠르게 속도를 줄임)
         const decelerationFactor = 0.9;
   
-        // 가속도 증가 계수 설정 (보수적으로 증가)
-        const accelerationFactor = 0.1;
+        // 노이즈 임계값 (아주 작은 값 무시)
+        const noiseThreshold = 0.01;
   
         // 칼만 필터 초기화
         const kalmanFilter = {
@@ -124,20 +123,20 @@ export const useRunStore = defineStore("run", () => {
           let accelerationY = kalmanFilter.update(event.acceleration.y || 0);
           let accelerationZ = kalmanFilter.update(event.acceleration.z || 0);
   
-          // 가속도 보수적으로 증가
-          accelerationX = accelerationX * (1 - accelerationFactor) + event.acceleration.x * accelerationFactor;
-          accelerationY = accelerationY * (1 - accelerationFactor) + event.acceleration.y * accelerationFactor;
-          accelerationZ = accelerationZ * (1 - accelerationFactor) + event.acceleration.z * accelerationFactor;
+          // 노이즈 처리 (아주 작은 값은 0으로 처리)
+          accelerationX = Math.abs(accelerationX) < noiseThreshold ? 0 : accelerationX;
+          accelerationY = Math.abs(accelerationY) < noiseThreshold ? 0 : accelerationY;
+          accelerationZ = Math.abs(accelerationZ) < noiseThreshold ? 0 : accelerationZ;
   
           // 속도 업데이트 (v = u + at)
           velocityX += accelerationX * dt;
           velocityY += accelerationY * dt;
           velocityZ += accelerationZ * dt;
   
-          // 감속 적용 (빠르게 감소)
-          velocityX *= decelerationFactor;
-          velocityY *= decelerationFactor;
-          velocityZ *= decelerationFactor;
+          // 감속 적용 (빠르게 감소, 특정 값 이하로 떨어지면 0으로 설정)
+          velocityX = Math.abs(velocityX) < noiseThreshold ? 0 : velocityX * decelerationFactor;
+          velocityY = Math.abs(velocityY) < noiseThreshold ? 0 : velocityY * decelerationFactor;
+          velocityZ = Math.abs(velocityZ) < noiseThreshold ? 0 : velocityZ * decelerationFactor;
   
           // 거리 계산 (s = ut + 0.5at^2)
           const deltaX = velocityX * dt + 0.5 * accelerationX * dt * dt; // x축 이동 거리 (m)
@@ -166,6 +165,7 @@ export const useRunStore = defineStore("run", () => {
       }
     }
   };
+  
 
   const resultSend = async function () {
     Swal.fire("잠시만 기다려 주세요...", "결과를 전송 중입니다.", "info");
