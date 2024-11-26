@@ -31,7 +31,16 @@
         <hr v-if="isMyPage && followList.some(user => user.status === 0)" class="divider" />
         <ul>
           <li v-for="user in followList.filter(user => user.status === 1)" :key="user.userId">
-            <img :src="user.userImg || '/src/assets/default-profile.png'" alt="유저 이미지" />
+            <img
+              v-if="user.userImg"
+              :src="user.userImg"
+              alt="프로필 사진"
+            />
+            <img
+              v-else
+              src="@/assets/default-profile.png"
+              alt="기본 프로필 사진"
+            />
             <div class="user-info">
               <p>{{ user.nickname }}</p>
               <p>{{ user.userDist }}km {{ user.userPace }}</p>
