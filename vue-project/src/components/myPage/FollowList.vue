@@ -15,7 +15,7 @@
             />
             <img
               v-else
-              src="/src/assets/default-profile.png"
+              src="@/assets/default-profile.png"
               alt="기본 프로필 사진"
             />
             <div class="user-info">
