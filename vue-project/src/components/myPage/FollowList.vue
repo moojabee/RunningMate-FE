@@ -8,6 +8,7 @@
       <div class="modal-content">
         <ul v-if="isMyPage">
           <li v-for="user in followList.filter(user => user.status === 0)" :key="user.userId">
+            <img :src="user.userImg || '/src/assets/default-profile.png'" alt="유저 이미지" />
             <img
               v-if="user.userImg"
               :src="user.userImg"
@@ -15,7 +16,7 @@
             />
             <img
               v-else
-              src="/src/assets/default-profile.png"
+              src="@/assets/default-profile.png"
               alt="기본 프로필 사진"
             />
             <div class="user-info">
