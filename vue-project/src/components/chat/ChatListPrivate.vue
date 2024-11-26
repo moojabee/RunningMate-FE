@@ -5,13 +5,23 @@
                 <!-- 채팅방 사진과 텍스트 -->
                 <div class="chat-room-info">
                     <!-- 동그란 채팅방 사진 -->
-                    <img src="@/assets/default-profile.png" alt="Room Image" class="chat-room-image" />
-
+                    <img
+                        v-if="room.userList[1].userImg"
+                        :src="room.userList[1].userImg"
+                        alt="프로필 이미지"
+                        class="chat-room-image"
+                        />
+                    <img
+                        v-else
+                        src="@/assets/default-profile.png"
+                        alt="기본 프로필 이미지"
+                        class="chat-room-image"
+                        />
                     <!-- 방 이름과 최근 메시지 -->
                     <div class="chat-room-text">
                         <!-- 채팅방 이름 -->
                         <span class="chat-room-name">
-                            {{ room.roomName }}
+                            {{ getRoomName(room) }}
                         </span>
 
                         <!-- 최근 메시지 -->
@@ -36,10 +46,10 @@
 <script setup>
     import router from '@/router';
     import { useChatRoomStore } from '@/stores/chatRoom';
-    import { onMounted} from 'vue';
+    import { computed, onMounted } from 'vue';
 
     const store = useChatRoomStore();
-
+    const userId = sessionStorage.getItem('userId')
     const fetchChatRoomList = function() {
         store.loadChatRoomList();
     };
@@ -79,21 +89,36 @@
         cancelButtonText: "취소", // 취소 버튼 텍스트
     });
 
-    if (result.isConfirmed) {
-        store.leaveChatRoom({roomId: room.roomId,});
-        Swal.fire({
-        title: "나갔습니다!",
-        text: `채팅방 '${room.roomName}'에서 나왔습니다.`,
-        icon: "success",
-        timer: 2000,
-        showConfirmButton: false,
-        });
-    }
+        if (result.isConfirmed) {
+            store.leaveChatRoom({roomId: room.roomId,});
+            Swal.fire({
+            title: "나갔습니다!",
+            text: `채팅방 '${room.roomName}'에서 나왔습니다.`,
+            icon: "success",
+            timer: 2000,
+            showConfirmButton: false,
+            });
+        }
     };
-    onMounted(() => fetchChatRoomList());
+
+    // computed로 채팅방 이름을 계산하는 변수
+    const getRoomName = computed(() => {
+    return (room) => {
+        if (room.roomType == 'PERSONAL') {
+        // 'PERSONAL'일 때, userList에서 나와 일치하지 않는 상대방의 userNick을 반환
+        const otherUser = room.userList.find(user => user.userId != userId);
+        room.roomName = otherUser ? `[개인] ${otherUser.nickname}` : '알 수 없음';
+        return otherUser ? `[개인] ${otherUser.nickname}` : '알 수 없음'; // 상대방 userNick 또는 '알 수 없음'
+        }
+        return `[그룹] ${room.roomName}`; // 'PERSONAL'이 아닐 때는 기본 roomName
+    };
+    });
+
+    onMounted(() => {
+    fetchChatRoomList()
+    console.log(store.chatRoomList.value)
+    });
 </script>
-
-
 <style scoped>
 .chat-room-container {
     padding: 20px;
@@ -119,7 +144,7 @@ hr {
     align-items: center;
     padding: 10px 15px;
     margin-bottom: 15px;
-    background-color: #f9f9f9;
+    background-color: #ffffff;
     border: 1px solid #ddd;
     border-radius: 10px;
     box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
@@ -156,7 +181,7 @@ hr {
 .chat-room-name {
     font-size: 1em; /* 채팅방 이름 크기 */
     font-weight: bold;
-    color: #ff4d4d;
+    color: #555;
     margin-bottom: 5px; /* 이름과 내용 간격 추가 */
     white-space: nowrap; /* 한 줄로 표시 */
     overflow: hidden; /* 넘치는 내용 숨김 */
@@ -165,7 +190,7 @@ hr {
 }
 
 .last-chat-content {
-    font-size: 0.5em; /* 최근 메시지는 작게 */
+    font-size: 0.8em; /* 최근 메시지는 작게 */
     color: #555;
     white-space: nowrap; /* 한 줄로 표시 */
     overflow: hidden; /* 넘치는 내용 숨김 */
@@ -190,7 +215,7 @@ hr {
 
 .leave-button {
     padding: 5px 10px;
-    background-color: #ff4d4d;
+    background-color: #ff9561;
     color: white;
     border: none;
     border-radius: 5px;
@@ -199,7 +224,4 @@ hr {
     transition: background-color 0.2s;
 }
 
-.leave-button:hover {
-    background-color: #ff3333;
-}
 </style>

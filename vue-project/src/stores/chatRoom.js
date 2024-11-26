@@ -20,6 +20,7 @@ export const useChatRoomStore = defineStore('chatRoom', () => {
         })
         .then((res)=>{
             chatRoomList.value = res.data
+            console.log("나의 채팅방 : ",chatRoomList.value)
         })  
         .catch((error)=>{
             console.log("채팅방 목록 조회 실패",error)
@@ -119,8 +120,12 @@ export const useChatRoomStore = defineStore('chatRoom', () => {
         })
         .then((res)=>{
             console.log("chatRoom : " , res.data);
+<<<<<<< HEAD
             chatRoomInfo = res.data;
             console.log(chatRoomInfo)
+=======
+            chatRoomInfo.value = res.data;
+>>>>>>> 47b883c14cf57dd7d758b076d2f888acd92598e2
         })
         .catch((err)=>{
             console.log(err);
@@ -134,8 +139,9 @@ export const useChatRoomStore = defineStore('chatRoom', () => {
             headers: getAuthHeaders(),
         })
         .then((res)=>{
-            console.log(res.data)
             userListInChat.value =res.data
+            console.log("여기 : ",userListInChat.value)
+            return res.data
         })
         .catch((err)=>{
             console.log(err);

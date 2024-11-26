@@ -19,6 +19,9 @@ import MyRun from '@/components/myPage/MyRun.vue'
 import ChatEntryRoom from '@/components/chat/ChatEntryRoom.vue'
 import MyBoardUpdate from '@/components/myPage/MyBoardUpdate.vue'
 import MyPageUpdate from '@/components/myPage/MyPageUpdate.vue'
+import RunView from '@/components/run/RunView.vue'
+import Running from '@/components/run/Running.vue'
+import RunningResult from '@/components/run/RunningResult.vue'
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -57,7 +60,7 @@ const router = createRouter({
               component: BoardCreate
             },
             {
-              path: 'update/:id',
+              path: 'update/:boardId',
               name: 'boardUpdate',
               component: BoardUpdate
             },
@@ -92,6 +95,21 @@ const router = createRouter({
           ]
         },
         {
+          path: '/run',
+          name: 'run',
+          component: RunView,
+        },
+        {
+          path: '/running',
+          name: 'running',
+          component: Running
+        },
+        {
+          path: '/runningResult',
+          name: 'runningResult',
+          component: RunningResult
+        },
+        {
           path: '/myPage/:userId',
           name: 'myPage',
           component: MyPageView,
@@ -107,12 +125,12 @@ const router = createRouter({
               name: 'myRun',
               component: MyRun
             },
-            {
-              path: 'myBoardUpdate/:boardId',
-              name: 'myBoardUpdate',
-              component: MyBoardUpdate
-            },
           ]
+        },
+        {
+          path: 'myBoardUpdate/:boardId',
+          name: 'myBoardUpdate',
+          component: MyBoardUpdate
         },
         {
           path: "MyPageUpdate/:userId",

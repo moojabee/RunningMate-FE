@@ -33,7 +33,7 @@ export const useUserAuthStore = defineStore('userAuth', () => {
           })
           .then((res) => {
             // 로그인 성공 처리
-            console.log(res.data)
+            console.log("data : ", res);
             user.value = res.data;
             token.value = res.headers['authorization'];
             sessionStorage.setItem('userId', user.value.userId);

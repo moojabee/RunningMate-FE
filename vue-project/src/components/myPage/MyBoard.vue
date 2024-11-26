@@ -58,11 +58,12 @@
       <div class="post-footer">
         <div class="like-comment">
           <button @click="toggleLike(board)" class="like-button">
-            <span v-if="board.likeCheck === 1">💖</span>
-            <span v-else>🤍</span>
+            <span v-if="board.likeCheck === 1"><img src="@/assets/heart-full.png" style="width: 25px;"></span>
+            <span v-else><img src="@/assets/heart-empty.png" style="width: 25px;"></span>
           </button>
-          <span>{{ board.like.length }}</span>
-          <span>💬 {{ board.comment.length }}</span>
+          <span>{{ board.like.length }} </span>
+          <span><img src="@/assets/comment.png" style="width: 25px;"></span>
+          <span>{{ board.comment.length }}</span>
         </div>
         <button @click="openCommentModal(board)" class="comment-link">
           댓글 {{ board.comment.length }}개 보기
@@ -121,7 +122,7 @@ const updateCommentCount = ({ boardId, change }) => {
 const goToUpdatePage = (board) => {
   router.push({
     name: 'myBoardUpdate',
-    params: { id: board.boardId },
+    params: { boardId: board.boardId },
     props: { boardData: board }
   });
 };

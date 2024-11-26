@@ -58,11 +58,12 @@
       <div class="post-footer">
         <div class="like-comment">
           <button @click="toggleLike(board)" class="like-button">
-            <span v-if="board.likeCheck === 1">💖</span>
-            <span v-else>🤍</span>
+            <span v-if="board.likeCheck === 1"><img src="@/assets/heart-full.png" style="width: 25px;"></span>
+            <span v-else><img src="@/assets/heart-empty.png" style="width: 25px;"></span>
           </button>
-          <span>{{ board.like.length }}</span>
-          <span>💬 {{ board.comment.length }}</span>
+          <span>{{ board.like.length }} </span>
+          <span><img src="@/assets/comment.png" style="width: 25px;"></span>
+          <span>{{ board.comment.length }}</span>
         </div>
         <button @click="openCommentModal(board)" class="comment-link">
           댓글 {{ board.comment.length }}개 보기
@@ -120,7 +121,7 @@ const updateCommentCount = ({ boardId, change }) => {
 const goToUpdatePage = (board) => {
   router.push({
     name: 'boardUpdate',
-    params: { id: board.boardId },
+    params: { boardId: board.boardId },
     props: { boardData: board }
   });
 };
@@ -189,11 +190,15 @@ const toggleLike = async (board) => {
 const formatTimestamp = (postedDate) => {
   const now = new Date();
   const postedTime = new Date(postedDate);
-  const diffInMs = now - postedTime;
 
+  const diffInMs = now - postedTime; // 밀리초 단위 차이 계산
   const diffInMinutes = Math.floor(diffInMs / (1000 * 60));
   const diffInHours = Math.floor(diffInMinutes / 60);
-  const diffInDays = Math.floor(diffInHours / 24);
+
+  // 날짜 차이를 계산
+  const nowDate = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+  const postedDateOnly = new Date(postedTime.getFullYear(), postedTime.getMonth(), postedTime.getDate());
+  const diffInDays = Math.round((nowDate - postedDateOnly) / (1000 * 60 * 60 * 24)); // 날짜 차이 계산
 
   if (diffInMinutes < 60) {
     return `${diffInMinutes}분 전`;
@@ -208,6 +213,7 @@ const formatTimestamp = (postedDate) => {
 // 페이지 마운트 시 게시글 목록 가져오기
 onMounted(() => {
   store.getNeighborBoardList();
+  store.getFollowBoardList();
 });
 </script>
 

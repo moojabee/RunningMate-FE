@@ -32,15 +32,23 @@
           </button>
           <!-- 비공개 계정에 팔로우 버튼 -->
           <button
-            v-else-if="!isMyPage && isPrivate && !isFollower"
+            v-else-if="!isMyPage && !isFollower && !isFollowRequest"
             @click="followUser"
             class="follow-btn"
           >
             팔로우
           </button>
+          <!-- 요청된 팔로우 -->
+          <button
+            v-else-if="!isMyPage && !isFollower && isFollowRequest"
+            class="follow-request-btn"
+            disabled
+          >
+            요청됨
+          </button>
           <!-- 팔로워일 경우 메시지 버튼 -->
           <button
-            v-else-if="!isMyPage && (isFollower || !isPrivate)"
+            v-else-if="!isMyPage && isFollower"
             @click="sendMessage"
             class="message-btn"
           >
@@ -76,7 +84,7 @@
 
     <hr class="divider" />
 
-    <div v-if="isMyPage || (!isPrivate || isFollower)">
+    <div v-if="isMyPage || (isFollower || !isPrivate)">
       <!-- 탭 네비게이션 -->
       <nav class="tab-navigation">
         <RouterLink
@@ -133,16 +141,16 @@ const isMyPage = computed(() => {
 });
 const isPrivate = ref(false); // 비공개 계정 여부
 const isFollower = ref(false); // 팔로워 여부
+const isFollowRequest = ref(false);
 
 // 데이터 로드 함수
 const loadData = async (userId) => {
   try {
     await store.getUserInfo(userId);
     if (!isMyPage.value) {
-      isPrivate.value = await store.checkPrivate(userId);
-      if (isPrivate.value) {
-        isFollower.value = await store.checkFollower(userId);
-      }
+      isPrivate.value = !await store.checkPrivate(userId);
+      isFollower.value = await store.checkFollower(userId);
+      isFollowRequest.value = await store.checkFollowRequest(userId);
     }
     await store.getFollower(userId);
     await store.getFollowing(userId);
@@ -158,13 +166,22 @@ const goToUpdatePage = () => {
 
 // 팔로우 요청
 const followUser = async () => {
-  
+  try {
+    const userIdToFollow = store.userInfo.userId; // 마이페이지 주인의 userId
+    await store.addFollow(userIdToFollow); // 팔로우 추가 요청
+    console.log("팔로우 요청 성공");
+
+    // 팔로우 요청 후 팔로워/팔로잉 리스트 다시 로드
+    await loadData(route.params.userId);
+  } catch (error) {
+    console.error("팔로우 요청 실패:", error);
+  }
 };
 
 // 메세지 전송 페이지 이동
 const sendMessage = () => {
   chatStore.createChatRoom({
-    roomName: `[개인]`,
+    roomName: `[개인] ${store.userInfo.nickname}`,
     roomType: 'PERSONAL',
     userList: [store.userInfo.nickname],
   })
@@ -234,7 +251,7 @@ watch(
 }
 
 .update-btn {
-  background-color: #507efd;
+  background-color: #5690ff;
   color: white;
   padding: 8px 10px;
   border: none;
@@ -246,6 +263,16 @@ watch(
 .follow-btn {
   background-color: #e2e2e2;
   color: rgb(71, 71, 71);
+  padding: 8px 15px;
+  border: 1px solid;
+  border-radius: 5px;
+  cursor: pointer;
+  font-weight: bold;
+}
+
+.follow-request-btn {
+  background-color: #e2e2e2;
+  color: rgb(163, 163, 163);
   padding: 8px 15px;
   border: 1px solid;
   border-radius: 5px;

@@ -3,15 +3,14 @@ import { defineStore } from 'pinia'
 import axios from 'axios'
 import router from '@/router'
 
-axios.defaults.withCredentials = true;
-
-const REST_API_URL = `http://localhost:8080/myPage`
+const REST_API_URL=import.meta.env.VITE_REST_API_URL + "/myPage"
 
 export const useMyPageStore = defineStore('myPage', () => {
   const myBoardList = ref([]);
   const userInfo = ref([]);
   const isPrivate = ref(false);
   const isFollower = ref(false);
+  const isFollowRequest = ref(false);
   const followerList = ref([]);
   const followingList = ref([]);
 
@@ -175,6 +174,21 @@ export const useMyPageStore = defineStore('myPage', () => {
     }
   };
 
+  // 팔로우 요청 여부 확인
+  const checkFollowRequest = async (writerId) => {
+    try {
+      const response = await axios.get(`${REST_API_URL}/isFollowRequest/${writerId}`, {
+        headers: getAuthHeaders(),
+      });
+      console.log(`팔로우 요청 상태 확인: ${response.data}`);
+      isFollowRequest.value = response.data;
+      return response.data;
+    } catch (error) {
+      console.error('팔로우 요청 상태 확인 실패:', error);
+      return false;
+    }
+  };
+
   // 유저 정보 수정 메서드
   const updateUserInfo = async (user, userImg) => {
     const formData = new FormData();
@@ -203,6 +217,7 @@ export const useMyPageStore = defineStore('myPage', () => {
     }
   };
 
+  // 팔로워 리스트
   const getFollower = async (userId) => {
     try {
       const response = await axios.get(`${REST_API_URL}/follower/${userId}`, {
@@ -216,6 +231,7 @@ export const useMyPageStore = defineStore('myPage', () => {
     }
   };
 
+  // 팔로잉 리스트
   const getFollowing = async (userId) => {
     try {
       const response = await axios.get(`${REST_API_URL}/following/${userId}`, {
@@ -229,9 +245,62 @@ export const useMyPageStore = defineStore('myPage', () => {
     }
   };
 
+  // 팔로우 추가
+  const addFollow = async (userId) => {
+    try {
+      await axios.post(`${REST_API_URL}/follow/${userId}`, null, {
+        headers: getAuthHeaders(),
+      });
+      console.log(`팔로우 추가 성공: ${userId}`);
+    } catch (error) {
+      console.error(`팔로우 추가 실패: ${userId}`, error);
+      throw error;
+    }
+  };
+
+  // 팔로워 삭제
+  const deleteFollower = async (userId) => {
+    try {
+      await axios.delete(`${REST_API_URL}/follower/${userId}`, {
+        headers: getAuthHeaders(),
+      });
+      console.log(`팔로워 삭제 성공: ${userId}`);
+    } catch (error) {
+      console.error(`팔로워 삭제 실패: ${userId}`, error);
+      throw error;
+    }
+  };
+
+  // 팔로잉 삭제
+  const deleteFollowing = async (userId) => {
+    try {
+      await axios.delete(`${REST_API_URL}/following/${userId}`, {
+        headers: getAuthHeaders(),
+      });
+      console.log(`팔로잉 삭제 성공: ${userId}`);
+    } catch (error) {
+      console.error(`팔로잉 삭제 실패: ${userId}`, error);
+      throw error;
+    }
+  };
+
+  // 팔로우 상태 수정 (status 0 → 1)
+  const updateFollowStatus = async (userId) => {
+    try {
+      await axios.put(`${REST_API_URL}/follow/${userId}`, null, {
+        headers: getAuthHeaders(),
+      });
+      console.log(`팔로우 상태 수정 성공: ${userId}`);
+    } catch (error) {
+      console.error(`팔로우 상태 수정 실패: ${userId}`, error);
+      throw error;
+    }
+  };
+
 
   return { userInfo, myBoardList, getUserInfo, getUserBoard, getUserRun, 
     deleteBoard, updateBoard, toggleLike, userCheck,
-    isPrivate, isFollower, checkPrivate, checkFollower,
-    updateUserInfo, followerList, followingList, getFollower, getFollowing }
+    isPrivate, isFollower, isFollowRequest, checkPrivate, checkFollower, checkFollowRequest,
+    updateUserInfo, followerList, followingList, getFollower, getFollowing,
+    addFollow, deleteFollower, deleteFollowing, updateFollowStatus }
 })

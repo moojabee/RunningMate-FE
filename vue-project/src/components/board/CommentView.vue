@@ -87,11 +87,15 @@ watch(
 const formatTimestamp = (postedDate) => {
   const now = new Date();
   const postedTime = new Date(postedDate);
-  const diffInMs = now - postedTime;
 
+  const diffInMs = now - postedTime; // 밀리초 단위 차이 계산
   const diffInMinutes = Math.floor(diffInMs / (1000 * 60));
   const diffInHours = Math.floor(diffInMinutes / 60);
-  const diffInDays = Math.floor(diffInHours / 24);
+
+  // 날짜 차이를 계산
+  const nowDate = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+  const postedDateOnly = new Date(postedTime.getFullYear(), postedTime.getMonth(), postedTime.getDate());
+  const diffInDays = Math.round((nowDate - postedDateOnly) / (1000 * 60 * 60 * 24)); // 날짜 차이 계산
 
   if (diffInMinutes < 60) {
     return `${diffInMinutes}분 전`;
@@ -231,7 +235,7 @@ const closeModal = () => {
 .profile-img {
   width: 50px;
   height: 50px;
-  border-radius: 50%;
+  border-radius: 15%;
   object-fit: cover;
   margin-right: 10px;
 }
