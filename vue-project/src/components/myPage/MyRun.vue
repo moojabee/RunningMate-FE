@@ -8,8 +8,15 @@
     >
       <!-- 런닝 이미지 -->
       <img
-        :src="run.runImg || '/src/assets/default-run.png'"
-        alt="러닝 이미지"
+        v-if="run.runImg"
+        :src="run.runImg"
+        alt="프로필 사진"
+        class="run-img"
+      />
+      <img
+        v-else
+        src="/src/assets/default-run.png"
+        alt="기본 프로필 사진"
         class="run-img"
       />
 

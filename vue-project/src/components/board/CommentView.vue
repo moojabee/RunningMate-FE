@@ -235,7 +235,7 @@ const closeModal = () => {
 .profile-img {
   width: 50px;
   height: 50px;
-  border-radius: 50%;
+  border-radius: 15%;
   object-fit: cover;
   margin-right: 10px;
 }
